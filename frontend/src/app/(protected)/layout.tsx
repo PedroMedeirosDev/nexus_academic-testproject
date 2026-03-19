@@ -97,10 +97,10 @@ export default function ProtectedLayout({
         : "Nexus");
 
   return (
-    <div className="min-h-screen bg-[#0b1020] text-zinc-100">
+    <div className="min-h-screen bg-primary-950 text-zinc-100">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="hidden w-65 shrink-0 border-r border-white/10 bg-[#121827] lg:block">
+        <aside className="hidden w-65 shrink-0 border-r border-white/10 bg-primary-900 lg:block">
           {/* Logo */}
           <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -118,7 +118,7 @@ export default function ProtectedLayout({
                     href={item.href}
                     className={`flex w-full items-center px-5 py-2.5 text-sm transition ${
                       ativo
-                        ? "bg-blue-600/20 text-blue-300"
+                          ? "bg-primary-600/20 text-primary-300"
                         : "text-zinc-300 hover:bg-white/5"
                     }`}
                   >
@@ -139,7 +139,7 @@ export default function ProtectedLayout({
                     onClick={() => toggleSubmenu(item.label)}
                     className={`flex w-full items-center justify-between px-5 py-2.5 text-sm transition ${
                       temAtivo
-                        ? "bg-blue-600/20 text-blue-300"
+                          ? "bg-primary-600/20 text-primary-300"
                         : "text-zinc-300 hover:bg-white/5"
                     }`}
                   >
@@ -159,7 +159,7 @@ export default function ProtectedLayout({
                           href={sub.href}
                           className={`flex w-full items-center px-9 py-2 text-sm transition ${
                             pathname === sub.href
-                              ? "text-blue-300"
+                                ? "text-primary-400"
                               : "text-zinc-400 hover:text-zinc-200"
                           }`}
                         >
@@ -176,7 +176,7 @@ export default function ProtectedLayout({
 
         {/* Conteúdo */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-10 border-b border-white/10 bg-[#121827]/95 backdrop-blur">
+            <header className="sticky top-0 z-10 border-b border-white/10 bg-primary-900/95 backdrop-blur">
             <div className="flex h-16 items-center justify-between px-4 sm:px-6">
               <p className="text-base font-semibold sm:text-lg">
                 {tituloPagina}
@@ -186,9 +186,9 @@ export default function ProtectedLayout({
                 <button
                   type="button"
                   onClick={() => setMenuAberto((prev) => !prev)}
-                  className="flex items-center gap-2 rounded-full border border-blue-500/30 bg-[#18233d] px-3 py-1.5 text-sm text-zinc-100"
+                    className="flex items-center gap-2 rounded-full border border-primary-700/50 bg-primary-900/60 px-3 py-1.5 text-sm text-zinc-100"
                 >
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-blue-500/30 bg-[#10182d]">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary-700/50 bg-primary-950">
                     {nomeUsuario.charAt(0).toUpperCase()}
                   </span>
                   <span>Olá, {nomeUsuario}</span>
@@ -196,7 +196,7 @@ export default function ProtectedLayout({
                 </button>
 
                 {menuAberto && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 bg-[#0f1526] p-1 shadow-2xl">
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-primary-800/30 bg-primary-950 p-1 shadow-2xl shadow-black/40">
                     <button
                       type="button"
                       onClick={irParaPerfil}

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0416;
+  --foreground: #f1ecfc;
 }
 
 @theme inline {
@@ -10,17 +10,49 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ── Paleta Primary — Roxo Nexus ─────────────────────────────
+     50–400 : tons claros (fundos leves, hover, badges)
+     500–600 : roxo vibrante (botões, foco, ícones ativos)
+     700–800 : roxo sóbrio (anéis, bordas de ênfase)
+     900–950 : roxo quase preto (sidebar, shell, cards escuros)
+  ─────────────────────────────────────────────────────────── */
+  --color-primary-50:  #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7e22ce;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #1c0b30;
+  --color-primary-950: #0d0416;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Seleção de texto com sotaque roxo */
+::selection {
+  background-color: rgb(147 51 234 / 0.28);
+  color: #f3e8ff;
+}
+
+/* ── Utilitário de card padrão do sistema ─────────────────────
+   Uso: className="card-nexus"
+   Combina bem com bg-primary-950 ou bg-primary-900 como pai.
+──────────────────────────────────────────────────────────── */
+@layer utilities {
+  .card-nexus {
+    border-radius: 1rem;
+    border: 1px solid rgb(147 51 234 / 0.18);
+    background-color: rgb(147 51 234 / 0.06);
+    box-shadow:
+      0 1px 3px rgb(0 0 0 / 0.45),
+      0 8px 32px rgb(147 51 234 / 0.07);
+  }
 }
