@@ -1,0 +1,67 @@
+# ─────────────────────────────────────────────────────────────────
+# Nexus Acadêmico — .gitignore raiz
+# Cobre: backend (Go) + frontend (Next.js)
+# ─────────────────────────────────────────────────────────────────
+
+# ── Variáveis de ambiente / segredos ─────────────────────────────
+.env
+.env.*
+!.env.example        # permite commitar arquivos de exemplo
+!**/.env.example
+
+# ── Go (backend) ─────────────────────────────────────────────────
+# Binários compilados
+backend/bin/
+backend/*.exe
+backend/*.out
+
+# Cache de build do Go
+/go-build-cache/
+
+# ── Next.js (frontend) ───────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Dependências
+frontend/node_modules/
+
+# Cache e artefatos
+frontend/.pnp
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/versions
+frontend/coverage/
+frontend/.vercel/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Logs de pacotes
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+
+# ── Sistema Operacional ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── IDEs e editores ───────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Certificados ─────────────────────────────────────────────────
+*.pem
+*.key
+*.crt

@@ -1,0 +1,33 @@
+<svg width="200" height="230" viewBox="0 0 200 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <rect width="200" height="230" rx="12" fill="#FAFAFA" />
+
+  <path d="M60 55 L140 135" 
+        stroke="#4C1D95" 
+        stroke-width="20" 
+        stroke-linecap="round"/>
+        
+  <path d="M140 55 L110 85" 
+        stroke="#FDE047" 
+        stroke-width="20" 
+        stroke-linecap="round"/>
+  <path d="M90 105 L60 135" 
+        stroke="#FDE047" 
+        stroke-width="20" 
+        stroke-linecap="round"/>
+
+  <circle cx="100" cy="95" r="16" fill="#4C1D95" />
+  <circle cx="100" cy="95" r="8" fill="#FDE047" />
+
+  <circle cx="60" cy="55" r="6" fill="#FDE047" />
+  <circle cx="140" cy="135" r="6" fill="#FDE047" />
+  <circle cx="140" cy="55" r="6" fill="#4C1D95" />
+  <circle cx="60" cy="135" r="6" fill="#4C1D95" />
+  
+  <text x="100" y="190" font-family="sans-serif" font-size="32" font-weight="900" text-anchor="middle">
+    <tspan fill="#4C1D95">ne</tspan><tspan fill="#FDE047">x</tspan><tspan fill="#4C1D95">us</tspan>
+  </text>
+  
+  <text x="100" y="215" font-family="sans-serif" font-size="18" font-weight="500" fill="#6B7280" text-anchor="middle" style="letter-spacing: 2px;">ACADÊMICO</text>
+
+</svg>
