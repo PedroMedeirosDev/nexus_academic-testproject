@@ -3,6 +3,7 @@ import { apiClient } from "@/shared/services/apiClient";
 export type Chamado = {
   id: number;
   assunto: string;
+  descricao: string;
   situacao: "Aberto" | "Em andamento" | "Resolvido" | "Fechado";
   prioridade: "Urgente" | "Alta" | "Normal" | "Baixa";
   tipo: string;
@@ -15,6 +16,7 @@ export type Chamado = {
 
 export type ChamadoRequest = {
   assunto: string;
+  descricao: string;
   situacao: string;
   prioridade: string;
   tipo: string;

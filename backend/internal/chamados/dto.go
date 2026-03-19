@@ -3,6 +3,7 @@ package chamados
 // ChamadoRequest é o payload recebido nas operações de criação/atualização.
 type ChamadoRequest struct {
 	Assunto     string `json:"assunto"`
+	Descricao   string `json:"descricao"`
 	Situacao    string `json:"situacao"`
 	Prioridade  string `json:"prioridade"`
 	Tipo        string `json:"tipo"`
@@ -15,6 +16,7 @@ type ChamadoRequest struct {
 type ChamadoResponse struct {
 	ID          int    `json:"id"`
 	Assunto     string `json:"assunto"`
+	Descricao   string `json:"descricao"`
 	Situacao    string `json:"situacao"`
 	Prioridade  string `json:"prioridade"`
 	Tipo        string `json:"tipo"`

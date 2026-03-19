@@ -47,7 +47,7 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 	offsetIdx := len(args) + 2
 
 	rows, err := db.QueryContext(ctx, fmt.Sprintf(`
-		SELECT c.id, c.assunto, c.situacao, c.prioridade,
+		SELECT c.id, c.assunto, c.descricao, c.situacao, c.prioridade,
 		       c.tipo, c.setor, c.solicitante, c.responsavel,
 		       c.criado_em, u.sigla
 		FROM   sup_chamados c
@@ -66,7 +66,7 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 		var c ChamadoResponse
 		var criadoEm time.Time
 		if err := rows.Scan(
-			&c.ID, &c.Assunto, &c.Situacao, &c.Prioridade,
+			&c.ID, &c.Assunto, &c.Descricao, &c.Situacao, &c.Prioridade,
 			&c.Tipo, &c.Setor, &c.Solicitante, &c.Responsavel,
 			&criadoEm, &c.Unidade,
 		); err != nil {
@@ -85,13 +85,13 @@ func Criar(ctx context.Context, db *sql.DB, req ChamadoRequest) (*ChamadoRespons
 
 	err := db.QueryRowContext(ctx, `
 		INSERT INTO sup_chamados
-		  (id_unidade, assunto, situacao, prioridade, tipo, setor, solicitante, responsavel)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		RETURNING id, assunto, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
+		  (id_unidade, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
 		idUnidadePadrao,
-		req.Assunto, req.Situacao, req.Prioridade,
+		req.Assunto, req.Descricao, req.Situacao, req.Prioridade,
 		req.Tipo, req.Setor, req.Solicitante, req.Responsavel,
-	).Scan(&c.ID, &c.Assunto, &c.Situacao, &c.Prioridade,
+	).Scan(&c.ID, &c.Assunto, &c.Descricao, &c.Situacao, &c.Prioridade,
 		&c.Tipo, &c.Setor, &c.Solicitante, &c.Responsavel, &criadoEm)
 	if err != nil {
 		return nil, err
@@ -109,19 +109,20 @@ func Atualizar(ctx context.Context, db *sql.DB, id int, req ChamadoRequest) (*Ch
 	err := db.QueryRowContext(ctx, `
 		UPDATE sup_chamados
 		SET    assunto     = $1,
-		       situacao    = $2,
-		       prioridade  = $3,
-		       tipo        = $4,
-		       setor       = $5,
-		       solicitante = $6,
-		       responsavel = $7,
+		       descricao   = $2,
+		       situacao    = $3,
+		       prioridade  = $4,
+		       tipo        = $5,
+		       setor       = $6,
+		       solicitante = $7,
+		       responsavel = $8,
 		       atualizado_em = NOW()
-		WHERE  id = $8 AND id_unidade = $9
-		RETURNING id, assunto, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
-		req.Assunto, req.Situacao, req.Prioridade,
+		WHERE  id = $9 AND id_unidade = $10
+		RETURNING id, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
+		req.Assunto, req.Descricao, req.Situacao, req.Prioridade,
 		req.Tipo, req.Setor, req.Solicitante, req.Responsavel,
 		id, idUnidadePadrao,
-	).Scan(&c.ID, &c.Assunto, &c.Situacao, &c.Prioridade,
+	).Scan(&c.ID, &c.Assunto, &c.Descricao, &c.Situacao, &c.Prioridade,
 		&c.Tipo, &c.Setor, &c.Solicitante, &c.Responsavel, &criadoEm)
 
 	if errors.Is(err, sql.ErrNoRows) {

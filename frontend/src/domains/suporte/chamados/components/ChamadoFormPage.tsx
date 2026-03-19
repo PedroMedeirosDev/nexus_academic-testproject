@@ -10,6 +10,7 @@ import type { HistoricoItem } from "../services/chamadosService";
 type ChamadoDetalhe = {
   id: number;
   assunto: string;
+  descricao: string;
   situacao: string;
   prioridade: string;
   tipo: string;
@@ -59,6 +60,7 @@ function criaNovo(): ChamadoDetalhe {
   return {
     id: 0,
     assunto: "",
+    descricao: "",
     situacao: "Aberto",
     prioridade: "Normal",
     tipo: "Sistema",
@@ -105,6 +107,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         setForm({
           id: base.id,
           assunto: base.assunto,
+          descricao: base.descricao,
           situacao: base.situacao,
           prioridade: base.prioridade,
           tipo: base.tipo,
@@ -139,6 +142,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
     try {
       const req = {
         assunto: form.assunto,
+        descricao: form.descricao,
         situacao: form.situacao,
         prioridade: form.prioridade,
         tipo: form.tipo,
@@ -366,6 +370,19 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               value={form.assunto}
               onChange={(e) => set("assunto", e.target.value)}
               className={selectCls}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-xs text-zinc-400">
+              Descrição
+            </label>
+            <textarea
+              rows={4}
+              maxLength={2000}
+              value={form.descricao}
+              onChange={(e) => set("descricao", e.target.value)}
+              placeholder="Descreva o problema ou solicitação com mais detalhes…"
+              className={`${selectCls} resize-none`}
             />
           </div>
         </div>
