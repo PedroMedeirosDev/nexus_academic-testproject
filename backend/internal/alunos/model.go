@@ -34,7 +34,7 @@ func Listar(ctx context.Context, db *sql.DB, f FiltrosListar) ([]AlunoResponse, 
 	}
 
 	rows, err := db.QueryContext(ctx, `
-		SELECT id, nome, codigo, cpf, data_nascimento, situacao
+		SELECT id, nome, codigo, cpf, data_nascimento, situacao, COALESCE(foto_url, '')
 		FROM   alunos
 		WHERE  id_unidade = $1
 		  AND  ($2 = '' OR nome    ILIKE '%' || $2 || '%')
@@ -52,7 +52,7 @@ func Listar(ctx context.Context, db *sql.DB, f FiltrosListar) ([]AlunoResponse, 
 	for rows.Next() {
 		var a AlunoResponse
 		var dn sql.NullTime
-		if err := rows.Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao); err != nil {
+		if err := rows.Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao, &a.FotoUrl); err != nil {
 			return nil, 0, err
 		}
 		if dn.Valid {
@@ -89,9 +89,9 @@ func Criar(ctx context.Context, db *sql.DB, req AlunoRequest) (*AlunoResponse, e
 	err := db.QueryRowContext(ctx, `
 		INSERT INTO alunos (id_unidade, nome, codigo, cpf, data_nascimento, situacao)
 		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id, nome, codigo, cpf, data_nascimento, situacao`,
+		RETURNING id, nome, codigo, cpf, data_nascimento, situacao, COALESCE(foto_url, '')`,
 		idUnidadePadrao, req.Nome, req.Codigo, req.CPF, dnInput, situacaoValida(req.Situacao),
-	).Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao)
+	).Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao, &a.FotoUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -106,9 +106,9 @@ func ObterPorID(ctx context.Context, db *sql.DB, id int) (*AlunoResponse, error)
 	var a AlunoResponse
 	var dn sql.NullTime
 	err := db.QueryRowContext(ctx, `
-		SELECT id, nome, codigo, cpf, data_nascimento, situacao
+		SELECT id, nome, codigo, cpf, data_nascimento, situacao, COALESCE(foto_url, '')
 		FROM   alunos WHERE id = $1 AND id_unidade = $2`,
-		id, idUnidadePadrao).Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao)
+		id, idUnidadePadrao).Scan(&a.ID, &a.Nome, &a.Codigo, &a.CPF, &dn, &a.Situacao, &a.FotoUrl)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
@@ -128,4 +128,12 @@ func situacaoValida(s string) string {
 	default:
 		return "Ativo"
 	}
+}
+
+// AtualizarFoto persiste a nova URL de foto do aluno.
+func AtualizarFoto(ctx context.Context, db *sql.DB, id int, fotoUrl string) error {
+	_, err := db.ExecContext(ctx,
+		`UPDATE alunos SET foto_url = $1 WHERE id = $2 AND id_unidade = $3`,
+		fotoUrl, id, idUnidadePadrao)
+	return err
 }

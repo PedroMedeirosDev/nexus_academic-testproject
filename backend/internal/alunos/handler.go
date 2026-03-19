@@ -119,3 +119,32 @@ func ObterHandler(db *sql.DB) http.HandlerFunc {
 		responderJSON(w, http.StatusOK, aluno)
 	}
 }
+
+// AtualizarFotoHandler — PATCH /alunos/{id}/foto
+func AtualizarFotoHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || id <= 0 {
+			responderErro(w, http.StatusBadRequest, "id inválido")
+			return
+		}
+
+		var req AtualizarFotoRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			responderErro(w, http.StatusBadRequest, "dados inválidos")
+			return
+		}
+		if req.FotoUrl == "" {
+			responderErro(w, http.StatusBadRequest, "fotoUrl é obrigatório")
+			return
+		}
+
+		if err := AtualizarFoto(r.Context(), db, id, req.FotoUrl); err != nil {
+			responderErro(w, http.StatusInternalServerError, "erro ao atualizar foto")
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]string{"fotoUrl": req.FotoUrl})
+	}
+}

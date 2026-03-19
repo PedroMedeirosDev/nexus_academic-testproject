@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -14,9 +14,12 @@ import {
   BookOpen,
   ClipboardList,
   ArrowLeft,
+  Camera,
+  Loader2,
 } from "lucide-react";
 import { useQueryMestre } from "@/shared/hooks/useQueryMestre";
 import { alunosService, type Aluno } from "../services/alunosService";
+import { uploadFotoAluno } from "@/shared/services/uploadService";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -376,6 +379,10 @@ export function FichaAcademicaPage({ id }: { id: number }) {
   const [secaoAtiva, setSecaoAtiva] = useState("academico");
   const [subAtiva, setSubAtiva] = useState("matricula");
   const [expandidas, setExpandidas] = useState<string[]>(["academico"]);
+  const [fotoUrlLocal, setFotoUrlLocal] = useState<string | null>(null);
+  const [uploadandoFoto, setUploadandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState<string | null>(null);
+  const inputFotoRef = useRef<HTMLInputElement>(null);
 
   const {
     data: aluno,
@@ -414,6 +421,30 @@ export function FichaAcademicaPage({ id }: { id: number }) {
       label: `${s.label} › ${sub.label}`,
     })),
   );
+
+  const fotoExibida = fotoUrlLocal ?? aluno?.fotoUrl ?? "";
+
+  async function handleSelecionarFoto(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    if (!aluno) return;
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+    setErroFoto(null);
+    setUploadandoFoto(true);
+    try {
+      const url = await uploadFotoAluno(aluno.id, arquivo);
+      await alunosService.atualizarFoto(aluno.id, url);
+      setFotoUrlLocal(url);
+    } catch (err) {
+      setErroFoto(
+        err instanceof Error ? err.message : "Erro ao fazer upload da foto.",
+      );
+    } finally {
+      setUploadandoFoto(false);
+      if (inputFotoRef.current) inputFotoRef.current.value = "";
+    }
+  }
 
   // Loading e erro antes do layout completo
   if (carregandoAluno) {
@@ -457,10 +488,60 @@ export function FichaAcademicaPage({ id }: { id: number }) {
             >
               <ArrowLeft size={12} /> Todos os alunos
             </button>
-            {/* Avatar */}
-            <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center rounded-full border-2 border-blue-500/30 bg-linear-to-br from-blue-600/40 to-indigo-700/40 text-2xl font-bold text-blue-200 select-none">
-              {aluno.nome.charAt(0).toUpperCase()}
+            {/* Avatar com upload — duplo clique abre seletor de arquivo */}
+            <input
+              ref={inputFotoRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleSelecionarFoto}
+            />
+            <div className="relative mx-auto mb-4 w-max">
+              <button
+                type="button"
+                onDoubleClick={() => inputFotoRef.current?.click()}
+                title="Clique duplo para alterar a foto"
+                disabled={uploadandoFoto}
+                className="group relative flex h-20 w-20 overflow-hidden rounded-full border-2 border-primary-600/40 bg-linear-to-br from-primary-600/40 to-indigo-700/40 focus:outline-none disabled:cursor-wait"
+              >
+                {fotoExibida ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={fotoExibida}
+                    alt={`Foto de ${aluno.nome}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-primary-200 select-none">
+                    {aluno.nome.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                {uploadandoFoto ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                    <Loader2 size={18} className="animate-spin text-white" />
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Camera size={18} className="text-white" />
+                  </div>
+                )}
+              </button>
+              {/* Ícone indicador: clique simples também abre o seletor */}
+              <button
+                type="button"
+                onClick={() => inputFotoRef.current?.click()}
+                title="Alterar foto"
+                disabled={uploadandoFoto}
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex h-6 w-6 items-center justify-center rounded-full border border-primary-700/50 bg-primary-900 text-primary-400 shadow-md transition hover:bg-primary-800 disabled:opacity-50"
+              >
+                <Camera size={11} />
+              </button>
             </div>
+            {erroFoto && (
+              <p className="mb-1 text-center text-[10px] leading-tight text-red-400">
+                {erroFoto}
+              </p>
+            )}
             <p className="text-sm font-semibold leading-snug text-zinc-100">
               {aluno.nome}
             </p>

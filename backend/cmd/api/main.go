@@ -75,6 +75,7 @@ func main() {
 	mux.HandleFunc("GET /alunos/count", alunos.ContarHandler(db))
 	mux.HandleFunc("GET /alunos/{id}", alunos.ObterHandler(db))
 	mux.HandleFunc("POST /alunos", alunos.CriarHandler(db))
+	mux.HandleFunc("PATCH /alunos/{id}/foto", alunos.AtualizarFotoHandler(db))
 
 	// Calendário
 	mux.HandleFunc("GET /calendario/eventos", calendario.ListarHandler(db))

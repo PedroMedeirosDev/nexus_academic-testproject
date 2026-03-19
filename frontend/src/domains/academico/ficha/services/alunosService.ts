@@ -7,6 +7,7 @@ export type Aluno = {
   cpf: string;
   dataNascimento: string; // "YYYY-MM-DD" ou ""
   situacao: "Ativo" | "Inativo" | "Trancado" | "Formado";
+  fotoUrl: string;
 };
 
 export type AlunoRequest = {
@@ -50,4 +51,7 @@ export const alunosService = {
   obter: (id: number) => apiClient.get<Aluno>(`/alunos/${id}`),
 
   criar: (req: AlunoRequest) => apiClient.post<Aluno>("/alunos", req),
+
+  atualizarFoto: (id: number, fotoUrl: string) =>
+    apiClient.patch<{ fotoUrl: string }>(`/alunos/${id}/foto`, { fotoUrl }),
 };

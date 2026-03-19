@@ -17,6 +17,12 @@ type AlunoResponse struct {
 	CPF            string `json:"cpf"`
 	DataNascimento string `json:"dataNascimento"` // "YYYY-MM-DD" ou ""
 	Situacao       string `json:"situacao"`
+	FotoUrl        string `json:"fotoUrl"`
+}
+
+// AtualizarFotoRequest é o payload para atualizar a foto do aluno.
+type AtualizarFotoRequest struct {
+	FotoUrl string `json:"fotoUrl"`
 }
 
 // ListaAlunosResponse encapsula paginação.

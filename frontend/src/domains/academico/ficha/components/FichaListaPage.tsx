@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, UserPlus, GraduationCap, X } from "lucide-react";
 import { useAlunos } from "../hooks/useAlunos";
@@ -48,6 +48,12 @@ export function FichaListaPage() {
   const [busca, setBusca] = useState("");
   const [filtroAtivo, setFiltroAtivo] = useState("");
 
+  // Debounce: atualiza o filtro 400 ms após o usuário parar de digitar
+  useEffect(() => {
+    const timer = setTimeout(() => setFiltroAtivo(busca.trim()), 400);
+    return () => clearTimeout(timer);
+  }, [busca]);
+
   const filtros = filtroAtivo ? { nome: filtroAtivo } : {};
   const {
     alunos,
@@ -60,17 +66,9 @@ export function FichaListaPage() {
     isFetchingNextPage,
   } = useAlunos(filtros);
 
-  const pesquisar = useCallback(() => {
-    setFiltroAtivo(busca.trim());
-  }, [busca]);
-
   function limpar() {
     setBusca("");
     setFiltroAtivo("");
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") pesquisar();
   }
 
   return (
@@ -94,41 +92,28 @@ export function FichaListaPage() {
       </div>
 
       {/* Barra de pesquisa */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
-          />
-          <input
-            type="text"
-            value={busca}
-            onChange={(e) => {
-              setBusca(e.target.value);
-              if (e.target.value === "") limpar();
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="Buscar por nome ou código…"
-            maxLength={150}
-            className="w-full rounded-lg border border-white/10 bg-[#121827] py-2.5 pl-9 pr-9 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30"
-          />
-          {busca && (
-            <button
-              type="button"
-              onClick={limpar}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={pesquisar}
-          className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
-        >
-          Buscar
-        </button>
+      <div className="relative">
+        <Search
+          size={15}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+        />
+        <input
+          type="text"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por nome ou código…"
+          maxLength={150}
+          className="w-full rounded-lg border border-white/10 bg-[#121827] py-2.5 pl-9 pr-9 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition focus:border-primary-600/60 focus:ring-1 focus:ring-primary-600/30"
+        />
+        {busca && (
+          <button
+            type="button"
+            onClick={limpar}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
 
       {/* Resultado */}
