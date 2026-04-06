@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, ChangeEvent } from "react";
 import { useUploadFoto } from "@/shared/hooks/useUploadFoto";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 export function PerfilPage() {
   const [usuarioId, setUsuarioId] = useState("");
@@ -12,12 +13,13 @@ export function PerfilPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const id = localStorage.getItem("sessao_usuario_id") ?? "";
-    const nome = localStorage.getItem("sessao_usuario_nome") ?? "Usuário";
-    const email = localStorage.getItem("sessao_usuario_email") ?? "";
-    setUsuarioId(id);
-    setNomeUsuario(nome);
-    setEmailUsuario(email);
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUsuarioId(user.id);
+        setNomeUsuario(user.user_metadata?.nome ?? user.email ?? "Usuário");
+        setEmailUsuario(user.email ?? "");
+      }
+    });
   }, []);
 
   const { uploading, erro, fotoUrl, upload, limparErro } = useUploadFoto({

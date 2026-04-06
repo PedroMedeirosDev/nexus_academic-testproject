@@ -1,15 +1,25 @@
+import { supabase } from "@/shared/lib/supabaseClient";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 type Opcoes = Omit<RequestInit, "body"> & { body?: unknown };
 
 async function request<T>(path: string, opcoes: Opcoes = {}): Promise<T> {
   const { body, ...rest } = opcoes;
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...(rest.headers ?? {}),
-    },
+      ...(session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : undefined),
+      ...(rest.headers as Record<string, string> | undefined),
+    } as HeadersInit,
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 

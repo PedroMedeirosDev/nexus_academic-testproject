@@ -155,8 +155,13 @@ export function FichaListaPage() {
                 className="flex w-full items-center gap-4 rounded-xl border border-white/6 bg-[#121827] px-4 py-3 text-left transition hover:border-blue-500/30 hover:bg-blue-600/5"
               >
                 {/* Avatar */}
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-sm font-bold text-zinc-300 select-none">
-                  {aluno.nome.charAt(0).toUpperCase()}
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-sm font-bold text-zinc-300 select-none">
+                  {aluno.fotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={aluno.fotoUrl} alt={aluno.nome} className="h-full w-full object-cover" />
+                  ) : (
+                    aluno.nome.charAt(0).toUpperCase()
+                  )}
                 </div>
 
                 {/* Dados */}

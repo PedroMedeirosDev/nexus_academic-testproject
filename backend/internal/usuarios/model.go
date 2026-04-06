@@ -1,9 +1,9 @@
 ﻿package usuarios
 
 import (
-"context"
-"database/sql"
-"errors"
+	"context"
+	"database/sql"
+	"errors"
 )
 
 // ObterPorEmail busca os dados do usuario. Retorna o usuario, a senha salva e o erro original.
@@ -44,10 +44,11 @@ lista = append(lista, u)
 return lista, rows.Err()
 }
 
-// AtualizarFoto persiste a URL publica da foto de perfil do usuario.
-func AtualizarFoto(ctx context.Context, db *sql.DB, id, fotoUrl string) error {
-_, err := db.ExecContext(ctx,
-`UPDATE usuarios SET foto_url = $1, atualizado_em = NOW() WHERE id = $2`,
-fotoUrl, id)
+// AtualizarFoto persiste a URL pública da foto de perfil do usuário.
+// O campo id deve ser o auth_id (UUID do Supabase Auth).
+func AtualizarFoto(ctx context.Context, db *sql.DB, authID, fotoUrl string) error {
+	_, err := db.ExecContext(ctx,
+		`UPDATE usuarios SET foto_url = $1, atualizado_em = NOW() WHERE auth_id = $2`,
+		fotoUrl, authID)
 return err
 }

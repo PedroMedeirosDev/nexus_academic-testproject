@@ -2,6 +2,7 @@ package chamados
 
 // ChamadoRequest é o payload recebido nas operações de criação/atualização.
 type ChamadoRequest struct {
+	UnidadeID   int    `json:"unidade_id"`
 	Assunto     string `json:"assunto"`
 	Descricao   string `json:"descricao"`
 	Situacao    string `json:"situacao"`
@@ -49,6 +50,8 @@ type HistoricoResponse struct {
 
 // Filtros encapsula os parâmetros de busca/paginação da listagem.
 type Filtros struct {
+	ID          int
+	UnidadeID   int
 	Num         string
 	Assunto     string
 	Solicitante string

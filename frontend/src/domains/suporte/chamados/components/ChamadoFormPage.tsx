@@ -1,14 +1,19 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/shared/lib/supabaseClient";
 import { useChamadoMutacoes } from "../hooks/useChamados";
 import { useResponsaveis } from "../hooks/useResponsaveis";
+import { useUnidades } from "../hooks/useUnidades";
 import { chamadosService } from "../services/chamadosService";
-import type { HistoricoItem } from "../services/chamadosService";
+import { anexosService } from "../services/comentariosService";
+import { ComentariosSection } from "./ComentariosSection";
+import { UploadArea } from "./UploadArea";
 
-type ChamadoDetalhe = {
+type ChamadoForm = {
   id: number;
+  unidadeId: number;
   assunto: string;
   descricao: string;
   situacao: string;
@@ -18,7 +23,6 @@ type ChamadoDetalhe = {
   solicitante: string;
   responsavel: string;
   unidade: string;
-  historico: HistoricoItem[];
 };
 
 const SITUACOES = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
@@ -56,9 +60,10 @@ const situacaoCor: Record<string, string> = {
   Fechado: "border border-zinc-500/40 bg-zinc-500/20 text-zinc-400",
 };
 
-function criaNovo(): ChamadoDetalhe {
+function criaNovo(): ChamadoForm {
   return {
     id: 0,
+    unidadeId: 0,
     assunto: "",
     descricao: "",
     situacao: "Aberto",
@@ -68,7 +73,6 @@ function criaNovo(): ChamadoDetalhe {
     solicitante: "",
     responsavel: "",
     unidade: "",
-    historico: [],
   };
 }
 
@@ -81,31 +85,39 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
 
   const { criar, atualizar } = useChamadoMutacoes();
   const { responsaveis, isLoading: carregandoResp } = useResponsaveis();
+  const { unidades, isLoading: carregandoUnidades } = useUnidades();
 
-  const [form, setForm] = useState<ChamadoDetalhe>(criaNovo());
-  const [historico, setHistorico] = useState<HistoricoItem[]>([]);
+  const [form, setForm] = useState<ChamadoForm>(criaNovo());
   const [carregando, setCarregando] = useState(!isNovo);
   const [erroCarga, setErroCarga] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [arquivosNovos, setArquivosNovos] = useState<File[]>([]);
 
-  // Carrega chamado existente e seu histórico
+  useEffect(() => {
+    if (!isNovo) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const nome =
+          user.user_metadata?.nome ??
+          user.user_metadata?.full_name ??
+          user.email ??
+          "";
+        setForm((f) => ({ ...f, solicitante: nome }));
+      }
+    });
+  }, [isNovo]);
+
   useEffect(() => {
     if (isNovo) return;
     setCarregando(true);
     setErroCarga(null);
-    Promise.all([
-      chamadosService.listar({ num: String(id), limit: 1, offset: 0 }),
-      chamadosService.listarHistorico(id),
-    ])
-      .then(([lista, hist]) => {
-        const base = lista.items.find((c) => c.id === id);
-        if (!base) {
-          setErroCarga("Chamado não encontrado.");
-          return;
-        }
+    chamadosService
+      .obter(id!)
+      .then((base) => {
         setForm({
           id: base.id,
+          unidadeId: 0,
           assunto: base.assunto,
           descricao: base.descricao,
           situacao: base.situacao,
@@ -115,15 +127,13 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
           solicitante: base.solicitante,
           responsavel: base.responsavel,
           unidade: base.unidade,
-          historico: [],
         });
-        setHistorico(hist.items);
       })
       .catch((e: Error) => setErroCarga(e.message))
       .finally(() => setCarregando(false));
   }, [id, isNovo]);
 
-  function set(field: keyof ChamadoDetalhe, value: string) {
+  function set(field: keyof ChamadoForm, value: string | number) {
     setErro(null);
     setForm((f) => ({ ...f, [field]: value }));
   }
@@ -137,10 +147,15 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
       setErro("O campo Solicitante é obrigatório.");
       return;
     }
+    if (isNovo && form.unidadeId <= 0) {
+      setErro("Selecione uma Unidade.");
+      return;
+    }
     setSalvando(true);
     setErro(null);
     try {
       const req = {
+        unidade_id: form.unidadeId,
         assunto: form.assunto,
         descricao: form.descricao,
         situacao: form.situacao,
@@ -151,11 +166,17 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         responsavel: form.responsavel,
       };
       if (isNovo) {
-        await criar.mutateAsync(req);
+        const criado = await criar.mutateAsync(req);
+        if (arquivosNovos.length > 0) {
+          for (const arquivo of arquivosNovos) {
+            await anexosService.upload(criado.id, null, arquivo);
+          }
+        }
+        router.replace(`/suporte/chamados/${criado.id}`);
       } else {
         await atualizar.mutateAsync({ id: form.id, req });
+        router.push("/suporte/chamados");
       }
-      router.push("/suporte/chamados");
     } catch (e: unknown) {
       setErro((e as Error).message ?? "Erro ao salvar chamado.");
     } finally {
@@ -177,7 +198,6 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold">
@@ -199,14 +219,6 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {!isNovo && (
-            <button
-              type="button"
-              className="rounded-lg border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:bg-white/5"
-            >
-              ↓ JSON
-            </button>
-          )}
           <button
             type="button"
             onClick={() => router.back()}
@@ -231,7 +243,6 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         </div>
       )}
 
-      {/* Informações (só em edição) */}
       {!isNovo && (
         <section className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
           <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-zinc-500">
@@ -256,7 +267,6 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         </section>
       )}
 
-      {/* Detalhes */}
       <section className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
         <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-zinc-500">
           Detalhes
@@ -266,26 +276,33 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
           <div className="mb-4 grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs text-zinc-400">
-                Unidade
+                Unidade *
               </label>
-              <input
-                type="text"
-                maxLength={100}
-                value={form.unidade}
-                onChange={(e) => set("unidade", e.target.value)}
+              <select
+                value={form.unidadeId}
+                onChange={(e) => set("unidadeId", Number(e.target.value))}
+                disabled={carregandoUnidades}
                 className={selectCls}
-              />
+              >
+                <option value={0}>— Selecione a unidade —</option>
+                {unidades.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nome} ({u.sigla})
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="mb-1 block text-xs text-zinc-400">
-                Solicitante
+                Solicitante *
               </label>
               <input
                 type="text"
-                maxLength={255}
+                maxLength={150}
                 value={form.solicitante}
-                onChange={(e) => set("solicitante", e.target.value)}
-                className={selectCls}
+                disabled
+                title="Preenchido automaticamente com o seu usuário"
+                className={`${selectCls} cursor-not-allowed opacity-70`}
               />
             </div>
           </div>
@@ -385,33 +402,45 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               className={`${selectCls} resize-none`}
             />
           </div>
+
+          {isNovo && (
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs text-zinc-400">Anexos</label>
+              {arquivosNovos.length > 0 && (
+                <ul className="mb-2 space-y-1">
+                  {arquivosNovos.map((f, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center justify-between rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-300"
+                    >
+                      <span className="truncate">{f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setArquivosNovos((prev) =>
+                            prev.filter((_, j) => j !== i),
+                          )
+                        }
+                        className="ml-2 text-zinc-500 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <UploadArea
+                onArquivos={(files) =>
+                  setArquivosNovos((prev) => [...prev, ...files])
+                }
+                carregando={salvando}
+              />
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Histórico */}
-      {!isNovo && historico.length > 0 && (
-        <section className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-            Histórico
-          </p>
-          <ul className="space-y-4">
-            {historico.map((h, i) => (
-              <li
-                key={h.id}
-                className={`${i > 0 ? "border-t border-white/5 pt-4" : ""}`}
-              >
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-zinc-200">
-                    {h.autor}
-                  </span>
-                  <span className="text-xs text-zinc-500">{h.data}</span>
-                </div>
-                <p className="mt-1 text-sm text-zinc-400">{h.mensagem}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {!isNovo && <ComentariosSection chamadoId={form.id} />}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export type Chamado = {
 };
 
 export type ChamadoRequest = {
+  unidade_id: number;
   assunto: string;
   descricao: string;
   situacao: string;
@@ -60,6 +61,8 @@ function buildQuery(f: FiltrosChamados): string {
 export const chamadosService = {
   listar: (f: FiltrosChamados = {}) =>
     apiClient.get<ListaChamadosResponse>(`/suporte/chamados?${buildQuery(f)}`),
+
+  obter: (id: number) => apiClient.get<Chamado>(`/suporte/chamados/${id}`),
 
   criar: (req: ChamadoRequest) =>
     apiClient.post<Chamado>("/suporte/chamados", req),

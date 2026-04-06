@@ -44,7 +44,7 @@ func validarChamado(req ChamadoRequest) string {
 	return ""
 }
 
-// ListarHandler — GET /suporte/chamados?num=&assunto=&solicitante=&responsavel=&limit=20&offset=0
+// ListarHandler — GET /suporte/chamados?num=&assunto=&solicitante=&responsavel=&unidade_id=&limit=20&offset=0
 func ListarHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
@@ -57,8 +57,10 @@ func ListarHandler(db *sql.DB) http.HandlerFunc {
 		if offset < 0 {
 			offset = 0
 		}
+		unidadeID, _ := strconv.Atoi(q.Get("unidade_id"))
 
 		f := Filtros{
+			UnidadeID:   unidadeID,
 			Num:         q.Get("num"),
 			Assunto:     q.Get("assunto"),
 			Solicitante: q.Get("solicitante"),
@@ -93,6 +95,9 @@ func CriarHandler(db *sql.DB) http.HandlerFunc {
 		if req.Prioridade == "" {
 			req.Prioridade = "Normal"
 		}
+		if req.UnidadeID <= 0 {
+			req.UnidadeID = 1
+		}
 
 		if msg := validarChamado(req); msg != "" {
 			responderErro(w, http.StatusUnprocessableEntity, msg)
@@ -106,6 +111,28 @@ func CriarHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		responderJSON(w, http.StatusCreated, chamado)
+	}
+}
+
+// ObterHandler — GET /suporte/chamados/{id}
+func ObterHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || id <= 0 {
+			responderErro(w, http.StatusBadRequest, "id inválido")
+			return
+		}
+
+		lista, _, err := Listar(r.Context(), db, Filtros{ID: id, Limit: 1, Offset: 0})
+		if err != nil {
+			responderErro(w, http.StatusInternalServerError, "erro ao obter chamado")
+			return
+		}
+		if len(lista) == 0 {
+			responderErro(w, http.StatusNotFound, "chamado não encontrado")
+			return
+		}
+		responderJSON(w, http.StatusOK, lista[0])
 	}
 }
 

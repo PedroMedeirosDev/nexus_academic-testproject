@@ -3,13 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 type SubItem = { label: string; href: string };
 type MenuItem =
   | { label: string; href: string; subitems?: never }
   | { label: string; href?: never; subitems: SubItem[] };
 
-const MENU: MenuItem[] = [
+const DEMO = process.env.NEXT_PUBLIC_DEMO === "true";
+
+const MENU_COMPLETO: MenuItem[] = [
   { label: "Início", href: "/dashboard" },
   {
     label: "Acadêmico",
@@ -25,6 +29,20 @@ const MENU: MenuItem[] = [
     subitems: [{ label: "Gestão de Chamados", href: "/suporte/chamados" }],
   },
 ];
+
+// Em modo demo, oculta Acadêmico e Financeiro
+const ROTAS_DEMO_BLOQUEADAS = ["/academico", "/financeiro"];
+
+const MENU = DEMO
+  ? MENU_COMPLETO.filter(
+      (item) =>
+        !ROTAS_DEMO_BLOQUEADAS.some((r) =>
+          item.subitems
+            ? item.subitems.some((s) => s.href.startsWith(r))
+            : item.href?.startsWith(r),
+        ),
+    )
+  : MENU_COMPLETO;
 
 const TITULOS: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -48,12 +66,32 @@ export default function ProtectedLayout({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [expandidos, setExpandidos] = useState<string[]>([]);
+  const [sessao, setSessao] = useState<Session | null>(null);
+  const [carregandoSessao, setCarregandoSessao] = useState(true);
 
   function toggleSubmenu(label: string) {
     setExpandidos((prev) =>
       prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
     );
   }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSessao(session);
+      setCarregandoSessao(false);
+      if (!session) router.replace("/login");
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSessao(session);
+      if (!session) router.replace("/login");
+    });
+
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     function handleClickFora(event: MouseEvent) {
@@ -65,6 +103,12 @@ export default function ProtectedLayout({
     return () => document.removeEventListener("mousedown", handleClickFora);
   }, []);
 
+  async function sair() {
+    await supabase.auth.signOut();
+    setMenuAberto(false);
+    router.push("/login");
+  }
+
   function irParaPerfil() {
     setMenuAberto(false);
     router.push("/perfil");
@@ -75,18 +119,16 @@ export default function ProtectedLayout({
     router.push("/calendario");
   }
 
-  function sair() {
-    localStorage.removeItem("sessao_usuario_id");
-    localStorage.removeItem("sessao_usuario_nome");
-    localStorage.removeItem("sessao_usuario_email");
-    setMenuAberto(false);
-    router.push("/login");
-  }
-
   const nomeUsuario =
-    typeof window !== "undefined"
-      ? (localStorage.getItem("sessao_usuario_nome") ?? "Usuário")
-      : "Usuário";
+    sessao?.user?.user_metadata?.nome ?? sessao?.user?.email ?? "Usuário";
+
+  if (carregandoSessao) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-primary-950 text-zinc-500">
+        Carregando…
+      </div>
+    );
+  }
 
   const tituloPagina =
     TITULOS[pathname] ??
@@ -118,7 +160,7 @@ export default function ProtectedLayout({
                     href={item.href}
                     className={`flex w-full items-center px-5 py-2.5 text-sm transition ${
                       ativo
-                          ? "bg-primary-600/20 text-primary-300"
+                        ? "bg-primary-600/20 text-primary-300"
                         : "text-zinc-300 hover:bg-white/5"
                     }`}
                   >
@@ -139,7 +181,7 @@ export default function ProtectedLayout({
                     onClick={() => toggleSubmenu(item.label)}
                     className={`flex w-full items-center justify-between px-5 py-2.5 text-sm transition ${
                       temAtivo
-                          ? "bg-primary-600/20 text-primary-300"
+                        ? "bg-primary-600/20 text-primary-300"
                         : "text-zinc-300 hover:bg-white/5"
                     }`}
                   >
@@ -159,7 +201,7 @@ export default function ProtectedLayout({
                           href={sub.href}
                           className={`flex w-full items-center px-9 py-2 text-sm transition ${
                             pathname === sub.href
-                                ? "text-primary-400"
+                              ? "text-primary-400"
                               : "text-zinc-400 hover:text-zinc-200"
                           }`}
                         >
@@ -176,7 +218,7 @@ export default function ProtectedLayout({
 
         {/* Conteúdo */}
         <div className="flex min-w-0 flex-1 flex-col">
-            <header className="sticky top-0 z-10 border-b border-white/10 bg-primary-900/95 backdrop-blur">
+          <header className="sticky top-0 z-10 border-b border-white/10 bg-primary-900/95 backdrop-blur">
             <div className="flex h-16 items-center justify-between px-4 sm:px-6">
               <p className="text-base font-semibold sm:text-lg">
                 {tituloPagina}
@@ -186,9 +228,9 @@ export default function ProtectedLayout({
                 <button
                   type="button"
                   onClick={() => setMenuAberto((prev) => !prev)}
-                    className="flex items-center gap-2 rounded-full border border-primary-700/50 bg-primary-900/60 px-3 py-1.5 text-sm text-zinc-100"
+                  className="flex items-center gap-2 rounded-full border border-primary-700/50 bg-primary-900/60 px-3 py-1.5 text-sm text-zinc-100"
                 >
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary-700/50 bg-primary-950">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary-700/50 bg-primary-950">
                     {nomeUsuario.charAt(0).toUpperCase()}
                   </span>
                   <span>Olá, {nomeUsuario}</span>

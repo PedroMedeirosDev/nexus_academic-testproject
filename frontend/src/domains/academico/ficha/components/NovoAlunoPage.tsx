@@ -151,6 +151,7 @@ export function NovoAlunoPage() {
               <option>Inativo</option>
               <option>Trancado</option>
               <option>Formado</option>
+              <option>Reserva de Vaga</option>
             </select>,
           )}
         </div>

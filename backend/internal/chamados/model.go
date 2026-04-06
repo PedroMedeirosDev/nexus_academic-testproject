@@ -8,14 +8,15 @@ import (
 	"time"
 )
 
-// idUnidadePadrao é o id da unidade "Nexus" (registrada no seed).
-// TODO: substituir pelo id extraído do JWT quando autenticação estiver pronta.
-const idUnidadePadrao = 1
-
 // Listar retorna chamados com filtragem dinâmica e paginação.
 func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int, error) {
-	args := []any{idUnidadePadrao}
-	cond := "c.id_unidade = $1"
+	args := []any{}
+	cond := "1=1"
+
+	if f.UnidadeID > 0 {
+		args = append(args, f.UnidadeID)
+		cond += fmt.Sprintf(" AND c.id_unidade = $%d", len(args))
+	}
 
 	if f.Num != "" {
 		args = append(args, f.Num+"%")
@@ -32,6 +33,10 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 	if f.Responsavel != "" {
 		args = append(args, "%"+f.Responsavel+"%")
 		cond += fmt.Sprintf(" AND c.responsavel ILIKE $%d", len(args))
+	}
+	if f.ID > 0 {
+		args = append(args, f.ID)
+		cond += fmt.Sprintf(" AND c.id = $%d", len(args))
 	}
 
 	// Contagem total (sem paginação)
@@ -83,12 +88,17 @@ func Criar(ctx context.Context, db *sql.DB, req ChamadoRequest) (*ChamadoRespons
 	var c ChamadoResponse
 	var criadoEm time.Time
 
+	unidadeID := req.UnidadeID
+	if unidadeID <= 0 {
+		unidadeID = 1 // fallback para unidade padrão
+	}
+
 	err := db.QueryRowContext(ctx, `
 		INSERT INTO sup_chamados
 		  (id_unidade, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
-		idUnidadePadrao,
+		unidadeID,
 		req.Assunto, req.Descricao, req.Situacao, req.Prioridade,
 		req.Tipo, req.Setor, req.Solicitante, req.Responsavel,
 	).Scan(&c.ID, &c.Assunto, &c.Descricao, &c.Situacao, &c.Prioridade,
@@ -97,7 +107,6 @@ func Criar(ctx context.Context, db *sql.DB, req ChamadoRequest) (*ChamadoRespons
 		return nil, err
 	}
 	c.DataHora = criadoEm.Format("02/01/2006 15:04")
-	c.Unidade = "CD"
 	return &c, nil
 }
 
@@ -117,11 +126,11 @@ func Atualizar(ctx context.Context, db *sql.DB, id int, req ChamadoRequest) (*Ch
 		       solicitante = $7,
 		       responsavel = $8,
 		       atualizado_em = NOW()
-		WHERE  id = $9 AND id_unidade = $10
+		WHERE  id = $9
 		RETURNING id, assunto, descricao, situacao, prioridade, tipo, setor, solicitante, responsavel, criado_em`,
 		req.Assunto, req.Descricao, req.Situacao, req.Prioridade,
 		req.Tipo, req.Setor, req.Solicitante, req.Responsavel,
-		id, idUnidadePadrao,
+		id,
 	).Scan(&c.ID, &c.Assunto, &c.Descricao, &c.Situacao, &c.Prioridade,
 		&c.Tipo, &c.Setor, &c.Solicitante, &c.Responsavel, &criadoEm)
 
@@ -132,15 +141,13 @@ func Atualizar(ctx context.Context, db *sql.DB, id int, req ChamadoRequest) (*Ch
 		return nil, err
 	}
 	c.DataHora = criadoEm.Format("02/01/2006 15:04")
-	c.Unidade = "CD"
 	return &c, nil
 }
 
 // Excluir remove um chamado. Retorna false se não encontrado.
 func Excluir(ctx context.Context, db *sql.DB, id int) (bool, error) {
 	res, err := db.ExecContext(ctx,
-		`DELETE FROM sup_chamados WHERE id = $1 AND id_unidade = $2`,
-		id, idUnidadePadrao)
+		`DELETE FROM sup_chamados WHERE id = $1`, id)
 	if err != nil {
 		return false, err
 	}

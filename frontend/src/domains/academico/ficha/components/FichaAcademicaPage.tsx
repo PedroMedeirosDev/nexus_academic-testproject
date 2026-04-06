@@ -10,7 +10,6 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
-  Calendar,
   BookOpen,
   ClipboardList,
   ArrowLeft,
@@ -91,6 +90,7 @@ function BadgeSituacao({ situacao }: { situacao: Aluno["situacao"] }) {
     Inativo: "bg-zinc-500/15 text-zinc-400",
     Trancado: "bg-amber-500/15 text-amber-400",
     Formado: "bg-blue-500/15 text-blue-400",
+    Reserva_de_Vaga: "bg-yellow-500/15 text-yellow-400",
   }[situacao];
   return (
     <span
@@ -196,58 +196,13 @@ function ConteudoMatricula() {
             Matrícula Atual
           </h3>
           <span className="h-px flex-1 bg-white/8" />
-          <span className="text-xs text-zinc-600">2026</span>
+          <span className="text-xs text-zinc-600">{new Date().getFullYear()}</span>
         </div>
 
-        <div className="rounded-xl border border-white/8 bg-[#121827] p-5 shadow-sm">
-          {/* Destaque curso */}
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
-              <GraduationCap size={18} className="text-blue-400" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-zinc-100">
-                Educação Infantil
-              </p>
-              <p className="text-xs text-zinc-500">Grade: 2026-EI</p>
-            </div>
-            <div className="ml-auto shrink-0">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Ativo
-              </span>
-            </div>
-          </div>
-
-          <div className="mb-4 border-t border-white/6" />
-
-          {/* Grid de dados */}
-          <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                Período
-              </p>
-              <p className="mt-1 text-sm font-medium text-zinc-200">
-                1º Período
-              </p>
-              <p className="text-xs text-zinc-500">1PEIA</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                Turno
-              </p>
-              <p className="mt-1 text-sm font-medium text-zinc-200">Tarde</p>
-            </div>
-            <div className="col-span-2 sm:col-span-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                Data da Matrícula
-              </p>
-              <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-zinc-200">
-                <Calendar size={12} className="shrink-0 text-zinc-500" />
-                13/10/2025
-              </p>
-            </div>
-          </div>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/8 bg-[#121827] py-14 text-center shadow-sm">
+          <GraduationCap size={28} className="mb-2 text-zinc-700" />
+          <p className="text-sm text-zinc-500">Nenhuma matrícula ativa.</p>
+          <p className="mt-1 text-xs text-zinc-600">Use o formulário abaixo para realizar a primeira matrícula.</p>
         </div>
       </section>
 
@@ -266,7 +221,7 @@ function ConteudoMatricula() {
             próximo período.
           </p>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-zinc-400">Curso</label>
               <select
@@ -315,6 +270,16 @@ function ConteudoMatricula() {
                 <option>Noite</option>
                 <option>Integral</option>
               </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-zinc-400">Turma</label>
+              <input
+                type="text"
+                placeholder="Ex: Turma A"
+                maxLength={50}
+                className="w-full rounded-lg border border-white/10 bg-[#0b1020] px-3 py-2.5 text-sm text-zinc-300 placeholder-zinc-600 outline-none transition focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30"
+              />
             </div>
           </div>
 
@@ -424,9 +389,7 @@ export function FichaAcademicaPage({ id }: { id: number }) {
 
   const fotoExibida = fotoUrlLocal ?? aluno?.fotoUrl ?? "";
 
-  async function handleSelecionarFoto(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  async function handleSelecionarFoto(e: React.ChangeEvent<HTMLInputElement>) {
     if (!aluno) return;
     const arquivo = e.target.files?.[0];
     if (!arquivo) return;
