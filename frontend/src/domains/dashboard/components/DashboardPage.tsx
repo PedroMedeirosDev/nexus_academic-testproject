@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useChamadosDashboard } from "../hooks/useChamadosDashboard";
-import { useAlunosCount } from "@/domains/academico/ficha/hooks/useAlunosCount";
 
 const DIAS_SEMANA = [
   "Domingo",
@@ -42,7 +41,6 @@ export function DashboardPage() {
   const ano = hoje.getFullYear();
 
   const { chamados, isLoading: carregandoChamados } = useChamadosDashboard();
-  const { total: totalAlunos } = useAlunosCount();
 
   return (
     <div className="space-y-6">
@@ -57,14 +55,10 @@ export function DashboardPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
           <p className="text-sm text-zinc-400">Alunos Ativos</p>
-          <p className="mt-1 text-4xl font-bold leading-none">
-            {totalAlunos === null ? (
-              <span className="inline-block h-9 w-16 animate-pulse rounded bg-white/10" />
-            ) : (
-              totalAlunos.toLocaleString("pt-BR")
-            )}
+          <p className="mt-1 text-4xl font-bold leading-none text-zinc-600">
+            —
           </p>
-          <p className="mt-3 text-sm text-zinc-500">situação: Ativo</p>
+          <p className="mt-3 text-sm text-zinc-600">em breve</p>
         </article>
         <article className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
           <p className="text-sm text-zinc-400">Chamados Abertos</p>
