@@ -171,8 +171,11 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         const criado = await criar.mutateAsync(req);
         if (arquivosNovos.length > 0) {
           for (let i = 0; i < arquivosNovos.length; i++) {
-            await anexosService.upload(criado.id, null, arquivosNovos[i], (pct) =>
-              setProgressos((prev) => ({ ...prev, [i]: pct })),
+            await anexosService.upload(
+              criado.id,
+              null,
+              arquivosNovos[i],
+              (pct) => setProgressos((prev) => ({ ...prev, [i]: pct })),
             );
           }
         }
@@ -417,7 +420,8 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
                 <ul className="mb-2 space-y-1">
                   {arquivosNovos.map((f, i) => {
                     const pct = progressos[i];
-                    const emProgresso = salvando && pct !== undefined && pct < 100;
+                    const emProgresso =
+                      salvando && pct !== undefined && pct < 100;
                     const concluido = salvando && pct === 100;
                     return (
                       <li

@@ -56,6 +56,7 @@ type Filtros struct {
 	Assunto     string
 	Solicitante string
 	Responsavel string
+	Situacao    string
 	Limit       int
 	Offset      int
 }

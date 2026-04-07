@@ -65,6 +65,7 @@ func ListarHandler(db *sql.DB) http.HandlerFunc {
 			Assunto:     q.Get("assunto"),
 			Solicitante: q.Get("solicitante"),
 			Responsavel: q.Get("responsavel"),
+			Situacao:    q.Get("situacao"),
 			Limit:       limit,
 			Offset:      offset,
 		}

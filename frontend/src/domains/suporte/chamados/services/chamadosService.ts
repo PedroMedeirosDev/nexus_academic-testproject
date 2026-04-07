@@ -43,6 +43,7 @@ export type FiltrosChamados = {
   assunto?: string;
   solicitante?: string;
   responsavel?: string;
+  situacao?: string;
   limit?: number;
   offset?: number;
 };
@@ -53,6 +54,7 @@ function buildQuery(f: FiltrosChamados): string {
   if (f.assunto) p.set("assunto", f.assunto);
   if (f.solicitante) p.set("solicitante", f.solicitante);
   if (f.responsavel) p.set("responsavel", f.responsavel);
+  if (f.situacao) p.set("situacao", f.situacao);
   p.set("limit", String(f.limit ?? 20));
   p.set("offset", String(f.offset ?? 0));
   return p.toString();

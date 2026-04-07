@@ -40,7 +40,7 @@ export function DashboardPage() {
   const mes = MESES[hoje.getMonth()];
   const ano = hoje.getFullYear();
 
-  const { chamados, isLoading: carregandoChamados } = useChamadosDashboard();
+  const { chamados, totalAbertos, isLoading: carregandoChamados } = useChamadosDashboard();
 
   return (
     <div className="space-y-6">
@@ -63,13 +63,13 @@ export function DashboardPage() {
         <article className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
           <p className="text-sm text-zinc-400">Chamados Abertos</p>
           <p className="mt-1 text-4xl font-bold leading-none">
-            {carregandoChamados ? (
+            {totalAbertos === null ? (
               <span className="inline-block h-9 w-10 animate-pulse rounded bg-white/10" />
             ) : (
-              chamados.filter((c) => c.situacao === "Aberto").length
+              totalAbertos
             )}
           </p>
-          <p className="mt-3 text-sm text-zinc-500">últimos registros</p>
+          <p className="mt-3 text-sm text-zinc-500">total em aberto</p>
         </article>
         <article className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
           <p className="text-sm text-zinc-400">Mensalidades Pendentes</p>

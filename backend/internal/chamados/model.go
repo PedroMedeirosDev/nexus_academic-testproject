@@ -38,6 +38,10 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 		args = append(args, f.ID)
 		cond += fmt.Sprintf(" AND c.id = $%d", len(args))
 	}
+	if f.Situacao != "" {
+		args = append(args, f.Situacao)
+		cond += fmt.Sprintf(" AND c.situacao = $%d", len(args))
+	}
 
 	// Contagem total (sem paginação)
 	var total int

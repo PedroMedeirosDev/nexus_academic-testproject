@@ -152,7 +152,9 @@ export const anexosService = {
           onProgresso?.(100);
           resolve();
         } else {
-          reject(new Error(`Upload falhou (${xhr.status}): ${xhr.responseText}`));
+          reject(
+            new Error(`Upload falhou (${xhr.status}): ${xhr.responseText}`),
+          );
         }
       };
       xhr.onerror = () => reject(new Error("Erro de rede no upload"));
