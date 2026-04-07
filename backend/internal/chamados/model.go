@@ -51,6 +51,23 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 		return nil, 0, err
 	}
 
+	// Ordenação — allowlist para evitar SQL injection
+	colunasOrdenacao := map[string]string{
+		"id":        "c.id",
+		"prioridade": "c.prioridade",
+		"situacao":  "c.situacao",
+		"assunto":   "c.assunto",
+		"data":      "c.criado_em",
+	}
+	orderCol := "c.criado_em"
+	if col, ok := colunasOrdenacao[f.OrderBy]; ok {
+		orderCol = col
+	}
+	orderDir := "DESC"
+	if f.OrderDir == "asc" {
+		orderDir = "ASC"
+	}
+
 	// Dados paginados
 	limitIdx := len(args) + 1
 	offsetIdx := len(args) + 2
@@ -62,8 +79,8 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 		FROM   sup_chamados c
 		JOIN   unidades u ON u.id = c.id_unidade
 		WHERE  %s
-		ORDER  BY c.criado_em DESC
-		LIMIT  $%d OFFSET $%d`, cond, limitIdx, offsetIdx),
+		ORDER  BY %s %s
+		LIMIT  $%d OFFSET $%d`, cond, orderCol, orderDir, limitIdx, offsetIdx),
 		append(args, f.Limit, f.Offset)...)
 	if err != nil {
 		return nil, 0, err

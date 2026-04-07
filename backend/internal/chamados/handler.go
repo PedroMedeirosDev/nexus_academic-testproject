@@ -35,6 +35,9 @@ func validarChamado(req ChamadoRequest) string {
 	if strings.TrimSpace(req.Solicitante) == "" {
 		return "solicitante é obrigatório"
 	}
+	if strings.TrimSpace(req.Responsavel) == "" {
+		return "responsável é obrigatório"
+	}
 	if req.Situacao != "" && !situacoesValidas[req.Situacao] {
 		return "situacao inválida"
 	}
@@ -66,6 +69,8 @@ func ListarHandler(db *sql.DB) http.HandlerFunc {
 			Solicitante: q.Get("solicitante"),
 			Responsavel: q.Get("responsavel"),
 			Situacao:    q.Get("situacao"),
+			OrderBy:     q.Get("order_by"),
+			OrderDir:    q.Get("order_dir"),
 			Limit:       limit,
 			Offset:      offset,
 		}

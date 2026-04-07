@@ -65,8 +65,13 @@ export function ChamadosPage() {
     assunto: "",
     solicitante: "",
     responsavel: "",
+    situacao: "",
   });
-  const [filtrosAtivos, setFiltrosAtivos] = useState({ ...filtros });
+  const [filtrosAtivos, setFiltrosAtivos] = useState({
+    ...filtros,
+    orderBy: "data",
+    orderDir: "desc" as "asc" | "desc",
+  });
 
   const {
     items,
@@ -84,12 +89,19 @@ export function ChamadosPage() {
   const [excluirId, setExcluirId] = useState<number | null>(null);
 
   function procurar() {
-    setFiltrosAtivos({ ...filtros });
+    setFiltrosAtivos((prev) => ({ ...filtros, orderBy: prev.orderBy, orderDir: prev.orderDir }));
   }
   function limpar() {
-    const v = { num: "", assunto: "", solicitante: "", responsavel: "" };
+    const v = { num: "", assunto: "", solicitante: "", responsavel: "", situacao: "" };
     setFiltros(v);
-    setFiltrosAtivos(v);
+    setFiltrosAtivos((prev) => ({ ...v, orderBy: prev.orderBy, orderDir: prev.orderDir }));
+  }
+  function ordenar(col: string) {
+    setFiltrosAtivos((prev) => ({
+      ...prev,
+      orderBy: col,
+      orderDir: prev.orderBy === col && prev.orderDir === "desc" ? "asc" : "desc",
+    }));
   }
 
   const inputCls =
@@ -108,7 +120,7 @@ export function ChamadosPage() {
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {[
             { label: "Nº Solicitação", key: "num", max: 20 },
             { label: "Assunto", key: "assunto", max: 500 },
@@ -132,6 +144,20 @@ export function ChamadosPage() {
               />
             </div>
           ))}
+          <div>
+            <label className="mb-1 block text-xs text-zinc-400">Situação</label>
+            <select
+              value={filtros.situacao}
+              onChange={(e) => setFiltros((f) => ({ ...f, situacao: e.target.value }))}
+              className={inputCls}
+            >
+              <option value="">Todas</option>
+              <option>Aberto</option>
+              <option>Em andamento</option>
+              <option>Resolvido</option>
+              <option>Fechado</option>
+            </select>
+          </div>
         </div>
         <div className="mt-4 flex gap-2">
           <button
@@ -163,21 +189,38 @@ export function ChamadosPage() {
           <table className="w-full min-w-[950px] text-left text-sm">
             <thead className="border-b border-white/10 text-xs font-semibold text-zinc-400">
               <tr>
-                {[
-                  "Nº",
-                  "Prioridade",
-                  "Situação",
-                  "Assunto",
-                  "Solicitante",
-                  "Responsável",
-                  "Data/Hora",
-                  "Unid.",
-                  "Ações",
-                ].map((h) => (
-                  <th key={h} className="px-4 py-3">
-                    {h}
-                  </th>
-                ))}
+                {([
+                  { label: "Nº", col: "id" },
+                  { label: "Prioridade", col: "prioridade" },
+                  { label: "Situação", col: "situacao" },
+                  { label: "Assunto / Tipo", col: "assunto" },
+                  { label: "Solicitante", col: null },
+                  { label: "Responsável", col: null },
+                  { label: "Data/Hora", col: "data" },
+                  { label: "Unid.", col: null },
+                  { label: "Ações", col: null },
+                ] as { label: string; col: string | null }[]).map(({ label, col }) =>
+                  col ? (
+                    <th
+                      key={label}
+                      className="cursor-pointer select-none px-4 py-3 hover:text-zinc-200"
+                      onClick={() => ordenar(col)}
+                    >
+                      <span className="flex items-center gap-1">
+                        {label}
+                        {filtrosAtivos.orderBy === col ? (
+                          filtrosAtivos.orderDir === "asc" ? " ↑" : " ↓"
+                        ) : (
+                          <span className="text-zinc-600"> ↕</span>
+                        )}
+                      </span>
+                    </th>
+                  ) : (
+                    <th key={label} className="px-4 py-3">
+                      {label}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
@@ -224,78 +267,67 @@ export function ChamadosPage() {
                 </tr>
               )}
               {items.map((c: Chamado) => (
-                <>
-                  <tr
-                    key={c.id}
-                    className="border-t border-white/5 hover:bg-white/5"
-                  >
-                    <td className="px-4 py-3 font-semibold text-zinc-200">
-                      {c.id}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${prioridadeCor[c.prioridade] ?? ""}`}
+                <tr
+                  key={c.id}
+                  className="border-t border-white/5 hover:bg-white/5"
+                >
+                  <td className="px-4 py-3 font-semibold text-zinc-200">
+                    {c.id}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${prioridadeCor[c.prioridade] ?? ""}`}
+                    >
+                      {c.prioridade}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${situacaoCor[c.situacao] ?? ""}`}
+                    >
+                      {c.situacao}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-zinc-200">{c.assunto}</p>
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      {c.tipo} · {c.setor}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3 text-zinc-400">{c.solicitante}</td>
+                  <td className="px-4 py-3 text-zinc-400">
+                    {c.responsavel || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-zinc-400">{c.dataHora}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded bg-blue-600 px-2 py-0.5 text-xs font-semibold">
+                      {c.unidade}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        title="Editar"
+                        onClick={() =>
+                          router.push(`/suporte/chamados/${c.id}`)
+                        }
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
                       >
-                        {c.prioridade}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${situacaoCor[c.situacao] ?? ""}`}
+                        <IcoPencil />
+                      </button>
+                      <button
+                        type="button"
+                        title="Excluir"
+                        disabled={excluindo}
+                        onClick={() => setExcluirId(c.id)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:opacity-40"
                       >
-                        {c.situacao}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-zinc-200">{c.assunto}</td>
-                    <td className="px-4 py-3 text-zinc-400">{c.solicitante}</td>
-                    <td className="px-4 py-3 text-zinc-400">
-                      {c.responsavel || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-400">{c.dataHora}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded bg-blue-600 px-2 py-0.5 text-xs font-semibold">
-                        {c.unidade}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          title="Editar"
-                          onClick={() =>
-                            router.push(`/suporte/chamados/${c.id}`)
-                          }
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
-                        >
-                          <IcoPencil />
-                        </button>
-                        <button
-                          type="button"
-                          title="Excluir"
-                          disabled={excluindo}
-                          onClick={() => setExcluirId(c.id)}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:opacity-40"
-                        >
-                          <IcoTrash />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr
-                    key={`${c.id}-det`}
-                    className="border-t border-white/[0.03] bg-white/[0.015]"
-                  >
-                    <td colSpan={9} className="px-4 py-1.5 text-xs">
-                      <span className="font-medium text-zinc-400">Tipo</span>{" "}
-                      <span className="text-zinc-300">{c.tipo}</span>
-                      <span className="mx-4 text-zinc-700">|</span>
-                      <span className="font-medium text-zinc-400">
-                        Departamento
-                      </span>{" "}
-                      <span className="text-zinc-300">{c.setor}</span>
-                    </td>
-                  </tr>
-                </>
+                        <IcoTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>

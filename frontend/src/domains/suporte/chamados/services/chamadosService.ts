@@ -44,6 +44,8 @@ export type FiltrosChamados = {
   solicitante?: string;
   responsavel?: string;
   situacao?: string;
+  orderBy?: string;
+  orderDir?: "asc" | "desc";
   limit?: number;
   offset?: number;
 };
@@ -55,6 +57,8 @@ function buildQuery(f: FiltrosChamados): string {
   if (f.solicitante) p.set("solicitante", f.solicitante);
   if (f.responsavel) p.set("responsavel", f.responsavel);
   if (f.situacao) p.set("situacao", f.situacao);
+  if (f.orderBy) p.set("order_by", f.orderBy);
+  if (f.orderDir) p.set("order_dir", f.orderDir);
   p.set("limit", String(f.limit ?? 20));
   p.set("offset", String(f.offset ?? 0));
   return p.toString();

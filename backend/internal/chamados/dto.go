@@ -57,6 +57,8 @@ type Filtros struct {
 	Solicitante string
 	Responsavel string
 	Situacao    string
+	OrderBy     string
+	OrderDir    string
 	Limit       int
 	Offset      int
 }

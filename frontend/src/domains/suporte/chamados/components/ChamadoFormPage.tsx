@@ -79,6 +79,12 @@ function criaNovo(): ChamadoForm {
 const selectCls =
   "w-full rounded-lg border border-white/10 bg-[#0b1020] px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500";
 
+function fieldCls(erros: string[], campo: string) {
+  return erros.includes(campo)
+    ? "w-full rounded-lg border border-red-500 bg-red-500/10 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+    : selectCls;
+}
+
 export function ChamadoFormPage({ id }: { id: number | null }) {
   const router = useRouter();
   const toast = useToast();
@@ -92,6 +98,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
   const [carregando, setCarregando] = useState(!isNovo);
   const [erroCarga, setErroCarga] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [camposComErro, setCamposComErro] = useState<string[]>([]);
   const [salvando, setSalvando] = useState(false);
   const [arquivosNovos, setArquivosNovos] = useState<File[]>([]);
   const [progressos, setProgressos] = useState<Record<number, number>>({});
@@ -137,24 +144,30 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
 
   function set(field: keyof ChamadoForm, value: string | number) {
     setErro(null);
+    setCamposComErro((prev) => prev.filter((c) => c !== field));
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function falhar(campo: string, msg: string) {
+    setErro(msg);
+    setCamposComErro([campo]);
   }
 
   async function salvar() {
     if (!form.assunto.trim()) {
-      setErro("O campo Assunto é obrigatório.");
+      falhar("assunto", "O campo Assunto é obrigatório.");
       return;
     }
     if (!form.solicitante.trim()) {
-      setErro("O campo Solicitante é obrigatório.");
+      falhar("solicitante", "O campo Solicitante é obrigatório.");
       return;
     }
     if (isNovo && form.unidadeId <= 0) {
-      setErro("Selecione uma Unidade.");
+      falhar("unidadeId", "Selecione uma Unidade.");
       return;
     }
     if (!form.responsavel.trim()) {
-      setErro("O campo Responsável é obrigatório.");
+      falhar("responsavel", "O campo Responsável é obrigatório.");
       return;
     }
     setSalvando(true);
@@ -297,7 +310,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
                 value={form.unidadeId}
                 onChange={(e) => set("unidadeId", Number(e.target.value))}
                 disabled={carregandoUnidades}
-                className={selectCls}
+                className={fieldCls(camposComErro, "unidadeId")}
               >
                 <option value={0}>— Selecione a unidade —</option>
                 {unidades.map((u) => (
@@ -309,33 +322,30 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
             </div>
             <div>
               <label className="mb-1 block text-xs text-zinc-400">
-                Solicitante *
+                Solicitante
               </label>
-              <input
-                type="text"
-                maxLength={150}
-                value={form.solicitante}
-                disabled
-                title="Preenchido automaticamente com o seu usuário"
-                className={`${selectCls} cursor-not-allowed opacity-70`}
-              />
+              <p className="rounded-lg border border-white/10 bg-[#0b1020] px-3 py-2 text-sm text-zinc-300">
+                {form.solicitante || <span className="text-zinc-600">Carregando…</span>}
+              </p>
             </div>
           </div>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1 block text-xs text-zinc-400">Situação</label>
-            <select
-              value={form.situacao}
-              onChange={(e) => set("situacao", e.target.value)}
-              className={selectCls}
-            >
-              {SITUACOES.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+          {!isNovo && (
+            <div>
+              <label className="mb-1 block text-xs text-zinc-400">Situação</label>
+              <select
+                value={form.situacao}
+                onChange={(e) => set("situacao", e.target.value)}
+                className={selectCls}
+              >
+                {SITUACOES.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-xs text-zinc-400">
               Prioridade
@@ -382,9 +392,9 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               value={form.responsavel}
               onChange={(e) => set("responsavel", e.target.value)}
               disabled={carregandoResp}
-              className={selectCls}
+              className={fieldCls(camposComErro, "responsavel")}
             >
-              <option value="">— Sem responsável —</option>
+              <option value="">— Selecione o responsável —</option>
               {responsaveis.map((r) => (
                 <option key={r.id} value={r.nome}>
                   {r.nome}
@@ -401,13 +411,16 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               maxLength={500}
               value={form.assunto}
               onChange={(e) => set("assunto", e.target.value)}
-              className={selectCls}
+              className={fieldCls(camposComErro, "assunto")}
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-xs text-zinc-400">
-              Descrição
-            </label>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-xs text-zinc-400">Descrição</label>
+              <span className="text-xs text-zinc-600">
+                {form.descricao.length}/2000
+              </span>
+            </div>
             <textarea
               rows={4}
               maxLength={2000}
