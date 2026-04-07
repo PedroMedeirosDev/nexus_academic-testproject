@@ -9,6 +9,7 @@ Sistema web de gerenciamento de chamados de suporte para instituições de ensin
 ## Funcionalidades
 
 ### Chamados
+
 - Abertura de chamados com campos de assunto, descrição, tipo, setor, prioridade, unidade, solicitante e responsável
 - Listagem paginada com carregamento incremental (infinite scroll)
 - Filtros por número, assunto, solicitante e responsável
@@ -16,11 +17,13 @@ Sistema web de gerenciamento de chamados de suporte para instituições de ensin
 - Exclusão com confirmação via toast
 
 ### Comentários e Histórico
+
 - Seção de comentários por chamado, identificados por usuário autenticado
 - Edição de comentários próprios com marcação de "editado"
 - Histórico de alterações rastreado
 
 ### Anexos
+
 - Upload de arquivos (imagens, vídeos, PDFs, DOCX) por drag-and-drop ou clique
 - Limite de 50 MB por arquivo
 - Barra de progresso individual por arquivo durante o envio
@@ -29,11 +32,13 @@ Sistema web de gerenciamento de chamados de suporte para instituições de ensin
 - Armazenamento no Supabase Storage (bucket `chamados-anexos`)
 
 ### Dashboard
+
 - Contagem total de chamados em aberto (todos, não apenas os recentes)
 - Tabela dos 5 chamados mais recentes com acesso rápido por duplo clique
 - Atalho direto para abertura de novo chamado
 
 ### UX
+
 - Notificações toast para criação, exclusão e erros (verde/vermelho)
 - Autenticação via Supabase Auth com validação de JWT no backend
 - Interface responsiva, dark mode nativo
@@ -42,15 +47,15 @@ Sistema web de gerenciamento de chamados de suporte para instituições de ensin
 
 ## Stack
 
-| Camada | Tecnologia |
-|---|---|
-| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4 |
-| Estado / Cache | TanStack Query v5 |
-| Backend | Go 1.23 — API REST com `net/http` nativo |
-| Banco de dados | PostgreSQL via Supabase |
-| Autenticação | Supabase Auth (JWT ES256 / JWKS) |
-| Armazenamento | Supabase Storage |
-| Deploy | Vercel (frontend) · Railway (backend) |
+| Camada         | Tecnologia                                                     |
+| -------------- | -------------------------------------------------------------- |
+| Frontend       | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4 |
+| Estado / Cache | TanStack Query v5                                              |
+| Backend        | Go 1.23 — API REST com `net/http` nativo                       |
+| Banco de dados | PostgreSQL via Supabase                                        |
+| Autenticação   | Supabase Auth (JWT ES256 / JWKS)                               |
+| Armazenamento  | Supabase Storage                                               |
+| Deploy         | Vercel (frontend) · Railway (backend)                          |
 
 ---
 
@@ -68,15 +73,15 @@ Todos os endpoints são protegidos por middleware de autenticação JWT. As quer
 
 ### Endpoints
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/suporte/chamados` | Listar com filtros e paginação |
-| `POST` | `/suporte/chamados` | Criar chamado |
-| `GET` | `/suporte/chamados/:id` | Obter chamado por ID |
-| `PUT` | `/suporte/chamados/:id` | Atualizar chamado |
-| `DELETE` | `/suporte/chamados/:id` | Excluir chamado |
-| `GET` | `/suporte/chamados/:id/historico` | Listar histórico |
-| `POST` | `/suporte/chamados/:id/historico` | Adicionar entrada no histórico |
+| Método   | Rota                              | Descrição                      |
+| -------- | --------------------------------- | ------------------------------ |
+| `GET`    | `/suporte/chamados`               | Listar com filtros e paginação |
+| `POST`   | `/suporte/chamados`               | Criar chamado                  |
+| `GET`    | `/suporte/chamados/:id`           | Obter chamado por ID           |
+| `PUT`    | `/suporte/chamados/:id`           | Atualizar chamado              |
+| `DELETE` | `/suporte/chamados/:id`           | Excluir chamado                |
+| `GET`    | `/suporte/chamados/:id/historico` | Listar histórico               |
+| `POST`   | `/suporte/chamados/:id/historico` | Adicionar entrada no histórico |
 
 ---
 

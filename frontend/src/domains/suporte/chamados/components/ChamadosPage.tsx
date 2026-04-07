@@ -78,7 +78,10 @@ export function ChamadosPage() {
     hasNextPage,
     carregarMais,
     excluir,
+    excluindo,
   } = useChamados(filtrosAtivos);
+
+  const [excluirId, setExcluirId] = useState<number | null>(null);
 
   function procurar() {
     setFiltrosAtivos({ ...filtros });
@@ -94,8 +97,7 @@ export function ChamadosPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Gestão de Chamados</h1>
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={() => router.push("/suporte/chamados/novo")}
@@ -179,16 +181,38 @@ export function ChamadosPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && (
-                <tr>
-                  <td
-                    colSpan={9}
-                    className="px-4 py-10 text-center text-zinc-500"
-                  >
-                    Carregando…
-                  </td>
-                </tr>
-              )}
+              {isLoading &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={`skel-${i}`} className="border-t border-white/5">
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-8 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-5 w-16 animate-pulse rounded-full bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-5 w-20 animate-pulse rounded-full bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-52 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-24 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-24 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-28 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-5 w-12 animate-pulse rounded bg-white/10" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-6 w-14 animate-pulse rounded bg-white/10" />
+                    </td>
+                  </tr>
+                ))}
               {!isLoading && items.length === 0 && !isError && (
                 <tr>
                   <td
@@ -234,29 +258,23 @@ export function ChamadosPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1">
                         <button
                           type="button"
                           title="Editar"
                           onClick={() =>
                             router.push(`/suporte/chamados/${c.id}`)
                           }
-                          className="text-zinc-400 hover:text-zinc-100"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
                         >
                           <IcoPencil />
                         </button>
                         <button
                           type="button"
                           title="Excluir"
-                          onClick={() =>
-                            excluir(c.id, {
-                              onSuccess: () =>
-                                toast.success("Chamado excluído."),
-                              onError: () =>
-                                toast.error("Erro ao excluir chamado."),
-                            })
-                          }
-                          className="text-zinc-400 hover:text-red-400"
+                          disabled={excluindo}
+                          onClick={() => setExcluirId(c.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:opacity-40"
                         >
                           <IcoTrash />
                         </button>
@@ -298,6 +316,48 @@ export function ChamadosPage() {
           </div>
         )}
       </div>
+      {excluirId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#151b2d] p-6 shadow-xl">
+            <h3 className="mb-2 text-base font-semibold text-zinc-100">
+              Confirmar exclusão
+            </h3>
+            <p className="mb-6 text-sm text-zinc-400">
+              Tem certeza que deseja excluir o chamado{" "}
+              <span className="font-semibold text-zinc-200">#{excluirId}</span>?
+              Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setExcluirId(null)}
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={excluindo}
+                onClick={() =>
+                  excluir(excluirId, {
+                    onSuccess: () => {
+                      toast.success("Chamado excluído.");
+                      setExcluirId(null);
+                    },
+                    onError: () => {
+                      toast.error("Erro ao excluir chamado.");
+                      setExcluirId(null);
+                    },
+                  })
+                }
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+              >
+                {excluindo ? "Excluindo…" : "Excluir"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

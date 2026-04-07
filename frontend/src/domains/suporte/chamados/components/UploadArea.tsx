@@ -1,7 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ANEXO_MAX_LABEL } from "../services/comentariosService";
+import {
+  ANEXO_MAX_LABEL,
+  ANEXO_MAX_BYTES,
+} from "../services/comentariosService";
+import { useToast } from "@/shared/components/ToastProvider";
 
 type Props = {
   onArquivos: (arquivos: File[]) => void;
@@ -12,10 +16,27 @@ type Props = {
 export function UploadArea({ onArquivos, carregando, aceitar }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [arrastando, setArrastando] = useState(false);
+  const toast = useToast();
 
   function processar(arquivos: FileList | null) {
     if (!arquivos || arquivos.length === 0) return;
-    onArquivos(Array.from(arquivos));
+    const validos: File[] = [];
+    const rejeitados: string[] = [];
+    for (const f of Array.from(arquivos)) {
+      if (f.size > ANEXO_MAX_BYTES) {
+        rejeitados.push(f.name);
+      } else {
+        validos.push(f);
+      }
+    }
+    if (rejeitados.length > 0) {
+      toast.error(
+        `Arquivo muito grande (máx. ${ANEXO_MAX_LABEL}): ${rejeitados.join(", ")}`,
+      );
+    }
+    if (validos.length > 0) {
+      onArquivos(validos);
+    }
   }
 
   return (

@@ -153,6 +153,10 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
       setErro("Selecione uma Unidade.");
       return;
     }
+    if (!form.responsavel.trim()) {
+      setErro("O campo Responsável é obrigatório.");
+      return;
+    }
     setSalvando(true);
     setErro(null);
     try {
@@ -183,6 +187,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         router.replace(`/suporte/chamados/${criado.id}`);
       } else {
         await atualizar.mutateAsync({ id: form.id, req });
+        toast.success("Chamado atualizado com sucesso!");
         router.push("/suporte/chamados");
       }
     } catch (e: unknown) {
@@ -371,7 +376,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
           </div>
           <div className="sm:col-span-2">
             <label className="mb-1 block text-xs text-zinc-400">
-              Responsável
+              Responsável *
             </label>
             <select
               value={form.responsavel}
