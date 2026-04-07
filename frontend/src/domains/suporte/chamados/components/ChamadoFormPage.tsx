@@ -170,6 +170,10 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
       falhar("responsavel", "O campo Responsável é obrigatório.");
       return;
     }
+    if (!form.descricao.trim()) {
+      falhar("descricao", "O campo Descrição é obrigatório.");
+      return;
+    }
     setSalvando(true);
     setErro(null);
     try {
@@ -417,7 +421,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
           </div>
           <div className="sm:col-span-2">
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs text-zinc-400">Descrição</label>
+              <label className="text-xs text-zinc-400">Descrição *</label>
               <span className="text-xs text-zinc-600">
                 {form.descricao.length}/2000
               </span>
@@ -428,7 +432,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               value={form.descricao}
               onChange={(e) => set("descricao", e.target.value)}
               placeholder="Descreva o problema ou solicitação com mais detalhes…"
-              className={`${selectCls} resize-none`}
+              className={`${fieldCls(camposComErro, "descricao")} resize-none`}
             />
           </div>
 

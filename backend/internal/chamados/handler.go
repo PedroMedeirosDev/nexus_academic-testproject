@@ -38,6 +38,9 @@ func validarChamado(req ChamadoRequest) string {
 	if strings.TrimSpace(req.Responsavel) == "" {
 		return "responsável é obrigatório"
 	}
+	if strings.TrimSpace(req.Descricao) == "" {
+		return "descrição é obrigatória"
+	}
 	if req.Situacao != "" && !situacoesValidas[req.Situacao] {
 		return "situacao inválida"
 	}
