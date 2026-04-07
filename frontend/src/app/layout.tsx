@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Nexus Acadêmico",
   description: "Sistema de gestão acadêmica",
+  icons: {
+    icon: "/LogoNexus.svg",
+  },
 };
 
 export default function RootLayout({
