@@ -40,7 +40,11 @@ export function DashboardPage() {
   const mes = MESES[hoje.getMonth()];
   const ano = hoje.getFullYear();
 
-  const { chamados, totalAbertos, isLoading: carregandoChamados } = useChamadosDashboard();
+  const {
+    chamados,
+    totalAbertos,
+    isLoading: carregandoChamados,
+  } = useChamadosDashboard();
 
   return (
     <div className="space-y-6">
