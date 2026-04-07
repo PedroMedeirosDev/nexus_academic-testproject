@@ -132,7 +132,8 @@ export function DashboardPage() {
                   {chamados.map((row) => (
                     <tr
                       key={row.id}
-                      className="border-t border-white/5 text-zinc-200"
+                      className="border-t border-white/5 text-zinc-200 cursor-pointer hover:bg-white/5"
+                      onDoubleClick={() => router.push(`/suporte/chamados/${row.id}`)}
                     >
                       <td className="px-4 py-3 text-zinc-400">{row.id}</td>
                       <td className="px-4 py-3 font-medium">{row.assunto}</td>
@@ -239,7 +240,7 @@ export function DashboardPage() {
             <div className="mt-4 space-y-3">
               <button
                 type="button"
-                onClick={() => router.push("/suporte/chamados")}
+                onClick={() => router.push("/suporte/chamados/novo")}
                 className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left hover:bg-white/10"
               >
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-blue-500/20 text-blue-300">
