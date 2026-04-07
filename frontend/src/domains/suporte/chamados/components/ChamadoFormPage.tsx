@@ -228,9 +228,6 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-bold">
-            {isNovo ? "Novo Chamado" : `Chamado #${form.id}`}
-          </h1>
           {!isNovo && (
             <>
               <span
@@ -325,7 +322,9 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
                 Solicitante
               </label>
               <p className="rounded-lg border border-white/10 bg-[#0b1020] px-3 py-2 text-sm text-zinc-300">
-                {form.solicitante || <span className="text-zinc-600">Carregando…</span>}
+                {form.solicitante || (
+                  <span className="text-zinc-600">Carregando…</span>
+                )}
               </p>
             </div>
           </div>
@@ -334,7 +333,9 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
         <div className="grid gap-4 sm:grid-cols-2">
           {!isNovo && (
             <div>
-              <label className="mb-1 block text-xs text-zinc-400">Situação</label>
+              <label className="mb-1 block text-xs text-zinc-400">
+                Situação
+              </label>
               <select
                 value={form.situacao}
                 onChange={(e) => set("situacao", e.target.value)}

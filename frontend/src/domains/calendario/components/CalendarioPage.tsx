@@ -414,12 +414,7 @@ export function CalendarioPage() {
     <div className="space-y-6">
       {/* Cabeçalho da página */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Calendário</h1>
-          <p className="mt-1 text-sm text-zinc-400">
-            Gerencie eventos e compromissos
-          </p>
-        </div>
+        <p className="text-sm text-zinc-400">Gerencie eventos e compromissos</p>
         <button
           type="button"
           onClick={abrirNovo}

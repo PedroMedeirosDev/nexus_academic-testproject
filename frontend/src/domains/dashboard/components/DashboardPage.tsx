@@ -48,12 +48,9 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          {diaSemana}, {diaMes} de {mes} de {ano}
-        </p>
-      </div>
+      <p className="text-sm text-zinc-400">
+        {diaSemana}, {diaMes} de {mes} de {ano}
+      </p>
 
       {/* Cards de métricas */}
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

@@ -75,12 +75,9 @@ export function FichaListaPage() {
     <div className="space-y-6">
       {/* Cabeçalho */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Ficha Acadêmica</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Busque um aluno para acessar a ficha ou cadastre um novo.
-          </p>
-        </div>
+        <p className="text-sm text-zinc-500">
+          Busque um aluno para acessar a ficha ou cadastre um novo.
+        </p>
         <button
           type="button"
           onClick={() => router.push("/academico/ficha/novo")}

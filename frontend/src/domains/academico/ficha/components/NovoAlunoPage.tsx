@@ -71,12 +71,9 @@ export function NovoAlunoPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Cabeçalho */}
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-100">Novo Aluno</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Preencha os dados básicos para cadastrar um novo aluno no sistema.
-        </p>
-      </div>
+      <p className="text-sm text-zinc-500">
+        Preencha os dados básicos para cadastrar um novo aluno no sistema.
+      </p>
 
       {/* Formulário */}
       <form

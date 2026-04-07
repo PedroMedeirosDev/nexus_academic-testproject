@@ -89,18 +89,33 @@ export function ChamadosPage() {
   const [excluirId, setExcluirId] = useState<number | null>(null);
 
   function procurar() {
-    setFiltrosAtivos((prev) => ({ ...filtros, orderBy: prev.orderBy, orderDir: prev.orderDir }));
+    setFiltrosAtivos((prev) => ({
+      ...filtros,
+      orderBy: prev.orderBy,
+      orderDir: prev.orderDir,
+    }));
   }
   function limpar() {
-    const v = { num: "", assunto: "", solicitante: "", responsavel: "", situacao: "" };
+    const v = {
+      num: "",
+      assunto: "",
+      solicitante: "",
+      responsavel: "",
+      situacao: "",
+    };
     setFiltros(v);
-    setFiltrosAtivos((prev) => ({ ...v, orderBy: prev.orderBy, orderDir: prev.orderDir }));
+    setFiltrosAtivos((prev) => ({
+      ...v,
+      orderBy: prev.orderBy,
+      orderDir: prev.orderDir,
+    }));
   }
   function ordenar(col: string) {
     setFiltrosAtivos((prev) => ({
       ...prev,
       orderBy: col,
-      orderDir: prev.orderBy === col && prev.orderDir === "desc" ? "asc" : "desc",
+      orderDir:
+        prev.orderBy === col && prev.orderDir === "desc" ? "asc" : "desc",
     }));
   }
 
@@ -109,15 +124,14 @@ export function ChamadosPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => router.push("/suporte/chamados/novo")}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-        >
-          + Nova Solicitação
-        </button>
-      </div>
+      {/* FAB – Nova Solicitação */}
+      <button
+        type="button"
+        onClick={() => router.push("/suporte/chamados/novo")}
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/40 transition-colors hover:bg-blue-500"
+      >
+        + Nova Solicitação
+      </button>
 
       <div className="rounded-2xl border border-white/10 bg-[#151b2d] p-5">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -148,7 +162,9 @@ export function ChamadosPage() {
             <label className="mb-1 block text-xs text-zinc-400">Situação</label>
             <select
               value={filtros.situacao}
-              onChange={(e) => setFiltros((f) => ({ ...f, situacao: e.target.value }))}
+              onChange={(e) =>
+                setFiltros((f) => ({ ...f, situacao: e.target.value }))
+              }
               className={inputCls}
             >
               <option value="">Todas</option>
@@ -189,17 +205,19 @@ export function ChamadosPage() {
           <table className="w-full min-w-[950px] text-left text-sm">
             <thead className="border-b border-white/10 text-xs font-semibold text-zinc-400">
               <tr>
-                {([
-                  { label: "Nº", col: "id" },
-                  { label: "Prioridade", col: "prioridade" },
-                  { label: "Situação", col: "situacao" },
-                  { label: "Assunto / Tipo", col: "assunto" },
-                  { label: "Solicitante", col: null },
-                  { label: "Responsável", col: null },
-                  { label: "Data/Hora", col: "data" },
-                  { label: "Unid.", col: null },
-                  { label: "Ações", col: null },
-                ] as { label: string; col: string | null }[]).map(({ label, col }) =>
+                {(
+                  [
+                    { label: "Nº", col: "id" },
+                    { label: "Prioridade", col: "prioridade" },
+                    { label: "Situação", col: "situacao" },
+                    { label: "Assunto / Tipo", col: "assunto" },
+                    { label: "Solicitante", col: null },
+                    { label: "Responsável", col: null },
+                    { label: "Data/Hora", col: "data" },
+                    { label: "Unid.", col: null },
+                    { label: "Ações", col: null },
+                  ] as { label: string; col: string | null }[]
+                ).map(({ label, col }) =>
                   col ? (
                     <th
                       key={label}
@@ -209,7 +227,11 @@ export function ChamadosPage() {
                       <span className="flex items-center gap-1">
                         {label}
                         {filtrosAtivos.orderBy === col ? (
-                          filtrosAtivos.orderDir === "asc" ? " ↑" : " ↓"
+                          filtrosAtivos.orderDir === "asc" ? (
+                            " ↑"
+                          ) : (
+                            " ↓"
+                          )
                         ) : (
                           <span className="text-zinc-600"> ↕</span>
                         )}
@@ -219,7 +241,7 @@ export function ChamadosPage() {
                     <th key={label} className="px-4 py-3">
                       {label}
                     </th>
-                  )
+                  ),
                 )}
               </tr>
             </thead>
@@ -309,9 +331,7 @@ export function ChamadosPage() {
                       <button
                         type="button"
                         title="Editar"
-                        onClick={() =>
-                          router.push(`/suporte/chamados/${c.id}`)
-                        }
+                        onClick={() => router.push(`/suporte/chamados/${c.id}`)}
                         className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
                       >
                         <IcoPencil />
