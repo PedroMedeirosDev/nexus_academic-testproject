@@ -11,7 +11,6 @@ import { anexosService } from "../services/comentariosService";
 import { ComentariosSection } from "./ComentariosSection";
 import { UploadArea } from "./UploadArea";
 import { useToast } from "@/shared/components/ToastProvider";
-
 type ChamadoForm = {
   id: number;
   unidadeId: number;
@@ -95,6 +94,7 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [arquivosNovos, setArquivosNovos] = useState<File[]>([]);
+  const [progressos, setProgressos] = useState<Record<number, number>>({});
 
   useEffect(() => {
     if (!isNovo) return;
@@ -170,8 +170,10 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
       if (isNovo) {
         const criado = await criar.mutateAsync(req);
         if (arquivosNovos.length > 0) {
-          for (const arquivo of arquivosNovos) {
-            await anexosService.upload(criado.id, null, arquivo);
+          for (let i = 0; i < arquivosNovos.length; i++) {
+            await anexosService.upload(criado.id, null, arquivosNovos[i], (pct) =>
+              setProgressos((prev) => ({ ...prev, [i]: pct })),
+            );
           }
         }
         toast.success("Chamado criado com sucesso!");
@@ -413,25 +415,48 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
               <label className="mb-1 block text-xs text-zinc-400">Anexos</label>
               {arquivosNovos.length > 0 && (
                 <ul className="mb-2 space-y-1">
-                  {arquivosNovos.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center justify-between rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-300"
-                    >
-                      <span className="truncate">{f.name}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setArquivosNovos((prev) =>
-                            prev.filter((_, j) => j !== i),
-                          )
-                        }
-                        className="ml-2 text-zinc-500 hover:text-red-400"
+                  {arquivosNovos.map((f, i) => {
+                    const pct = progressos[i];
+                    const emProgresso = salvando && pct !== undefined && pct < 100;
+                    const concluido = salvando && pct === 100;
+                    return (
+                      <li
+                        key={i}
+                        className="overflow-hidden rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-300"
                       >
-                        ✕
-                      </button>
-                    </li>
-                  ))}
+                        <div className="flex items-center justify-between">
+                          <span className="truncate">{f.name}</span>
+                          {!salvando && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setArquivosNovos((prev) =>
+                                  prev.filter((_, j) => j !== i),
+                                )
+                              }
+                              className="ml-2 text-zinc-500 hover:text-red-400"
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {concluido && (
+                            <span className="ml-2 text-emerald-400">✓</span>
+                          )}
+                          {emProgresso && (
+                            <span className="ml-2 text-zinc-400">{pct}%</span>
+                          )}
+                        </div>
+                        {salvando && pct !== undefined && (
+                          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/10">
+                            <div
+                              className={`h-full rounded-full transition-all duration-200 ${concluido ? "bg-emerald-500" : "bg-blue-500"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
               <UploadArea

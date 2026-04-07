@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ANEXO_MAX_LABEL } from "../services/comentariosService";
 
 type Props = {
   onArquivos: (arquivos: File[]) => void;
@@ -64,7 +65,7 @@ export function UploadArea({ onArquivos, carregando, aceitar }: Props) {
             Arraste arquivos aqui ou clique para anexar
           </span>
           <span className="text-xs text-zinc-600">
-            Imagens, vídeos, PDFs, DOCX
+            Imagens, vídeos, PDFs, DOCX · Máx. {ANEXO_MAX_LABEL} por arquivo
           </span>
         </>
       )}

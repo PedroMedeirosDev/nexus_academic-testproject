@@ -250,8 +250,10 @@ export function ChamadosPage() {
                           title="Excluir"
                           onClick={() =>
                             excluir(c.id, {
-                              onSuccess: () => toast.success("Chamado excluído."),
-                              onError: () => toast.error("Erro ao excluir chamado."),
+                              onSuccess: () =>
+                                toast.success("Chamado excluído."),
+                              onError: () =>
+                                toast.error("Erro ao excluir chamado."),
                             })
                           }
                           className="text-zinc-400 hover:text-red-400"

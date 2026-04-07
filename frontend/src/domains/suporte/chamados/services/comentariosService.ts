@@ -98,6 +98,8 @@ export const comentariosService = {
 };
 
 const BUCKET = "chamados-anexos";
+export const ANEXO_MAX_BYTES = 50 * 1024 * 1024; // 50 MB
+export const ANEXO_MAX_LABEL = "50 MB";
 
 export const anexosService = {
   listar: async (chamadoId: number): Promise<Anexo[]> => {
@@ -114,20 +116,48 @@ export const anexosService = {
     chamadoId: number,
     comentarioId: number | null,
     file: File,
+    onProgresso?: (pct: number) => void,
   ): Promise<Anexo> => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Usuário não autenticado");
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) throw new Error("Sessão inválida");
+
     // Sanitiza o nome do arquivo para evitar path traversal
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${chamadoId}/${Date.now()}_${safeName}`;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(path, file, { upsert: false });
-    if (uploadError) throw new Error(uploadError.message);
+    // Upload via XHR para expor eventos de progresso reais
+    await new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${supabaseUrl}/storage/v1/object/${BUCKET}/${path}`);
+      xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
+      xhr.setRequestHeader(
+        "Content-Type",
+        file.type || "application/octet-stream",
+      );
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgresso) {
+          onProgresso(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          onProgresso?.(100);
+          resolve();
+        } else {
+          reject(new Error(`Upload falhou (${xhr.status}): ${xhr.responseText}`));
+        }
+      };
+      xhr.onerror = () => reject(new Error("Erro de rede no upload"));
+      xhr.send(file);
+    });
 
     const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
