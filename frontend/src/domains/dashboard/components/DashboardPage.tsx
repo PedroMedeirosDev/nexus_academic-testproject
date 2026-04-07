@@ -133,7 +133,9 @@ export function DashboardPage() {
                     <tr
                       key={row.id}
                       className="border-t border-white/5 text-zinc-200 cursor-pointer hover:bg-white/5"
-                      onDoubleClick={() => router.push(`/suporte/chamados/${row.id}`)}
+                      onDoubleClick={() =>
+                        router.push(`/suporte/chamados/${row.id}`)
+                      }
                     >
                       <td className="px-4 py-3 text-zinc-400">{row.id}</td>
                       <td className="px-4 py-3 font-medium">{row.assunto}</td>

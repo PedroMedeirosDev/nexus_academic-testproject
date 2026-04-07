@@ -10,6 +10,7 @@ import { chamadosService } from "../services/chamadosService";
 import { anexosService } from "../services/comentariosService";
 import { ComentariosSection } from "./ComentariosSection";
 import { UploadArea } from "./UploadArea";
+import { useToast } from "@/shared/components/ToastProvider";
 
 type ChamadoForm = {
   id: number;
@@ -81,6 +82,7 @@ const selectCls =
 
 export function ChamadoFormPage({ id }: { id: number | null }) {
   const router = useRouter();
+  const toast = useToast();
   const isNovo = id === null || id === 0;
 
   const { criar, atualizar } = useChamadoMutacoes();
@@ -172,13 +174,16 @@ export function ChamadoFormPage({ id }: { id: number | null }) {
             await anexosService.upload(criado.id, null, arquivo);
           }
         }
+        toast.success("Chamado criado com sucesso!");
         router.replace(`/suporte/chamados/${criado.id}`);
       } else {
         await atualizar.mutateAsync({ id: form.id, req });
         router.push("/suporte/chamados");
       }
     } catch (e: unknown) {
-      setErro((e as Error).message ?? "Erro ao salvar chamado.");
+      const msg = (e as Error).message ?? "Erro ao salvar chamado.";
+      setErro(msg);
+      toast.error(msg);
     } finally {
       setSalvando(false);
     }

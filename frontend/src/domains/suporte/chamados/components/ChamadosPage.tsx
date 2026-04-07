@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useChamados } from "../hooks/useChamados";
+import { useToast } from "@/shared/components/ToastProvider";
 import type { Chamado } from "../services/chamadosService";
 
 const prioridadeCor: Record<string, string> = {
@@ -58,6 +59,7 @@ const IcoTrash = () => (
 
 export function ChamadosPage() {
   const router = useRouter();
+  const toast = useToast();
   const [filtros, setFiltros] = useState({
     num: "",
     assunto: "",
@@ -246,7 +248,12 @@ export function ChamadosPage() {
                         <button
                           type="button"
                           title="Excluir"
-                          onClick={() => excluir(c.id)}
+                          onClick={() =>
+                            excluir(c.id, {
+                              onSuccess: () => toast.success("Chamado excluído."),
+                              onError: () => toast.error("Erro ao excluir chamado."),
+                            })
+                          }
                           className="text-zinc-400 hover:text-red-400"
                         >
                           <IcoTrash />

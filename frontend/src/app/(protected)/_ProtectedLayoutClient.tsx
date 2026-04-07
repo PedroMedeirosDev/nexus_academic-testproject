@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/shared/lib/supabaseClient";
+import { ToastProvider } from "@/shared/components/ToastProvider";
 
 type SubItem = { label: string; href: string };
 type MenuItem =
@@ -137,6 +138,7 @@ export default function ProtectedLayoutClient({
         : "Nexus");
 
   return (
+    <ToastProvider>
     <div className="min-h-screen bg-primary-950 text-zinc-100">
       <div className="flex min-h-screen">
         {/* Sidebar */}
@@ -269,5 +271,6 @@ export default function ProtectedLayoutClient({
         </div>
       </div>
     </div>
+    </ToastProvider>
   );
 }
