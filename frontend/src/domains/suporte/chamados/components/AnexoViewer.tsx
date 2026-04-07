@@ -159,28 +159,38 @@ export function AnexoViewer({ anexos, onExcluir, podeExcluir }: Props) {
 
             {/* Vídeo inline */}
             {tipo === "video" && (
-              <video controls className="w-full max-h-72 bg-black">
-                <source src={a.url} type={a.mime_type} />
-                Seu navegador não suporta o player de vídeo.
-              </video>
+              <div className="flex justify-start border-t border-white/10 p-3">
+                <video
+                  controls
+                  className="w-full max-w-2xl rounded-lg bg-black"
+                  style={{ maxHeight: "360px" }}
+                >
+                  <source src={a.url} type={a.mime_type} />
+                  Seu navegador não suporta o player de vídeo.
+                </video>
+              </div>
             )}
 
             {/* PDF inline */}
             {tipo === "pdf" && (
-              <iframe
-                src={a.url}
-                title={a.nome_arquivo}
-                className="h-96 w-full border-t border-white/10"
-              />
+              <div className="border-t border-white/10 p-3">
+                <iframe
+                  src={a.url}
+                  title={a.nome_arquivo}
+                  className="h-96 w-full max-w-3xl rounded-lg border border-white/10"
+                />
+              </div>
             )}
 
             {/* DOCX via Microsoft Office Online */}
             {tipo === "docx" && (
-              <iframe
-                src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(a.url)}`}
-                title={a.nome_arquivo}
-                className="h-96 w-full border-t border-white/10"
-              />
+              <div className="border-t border-white/10 p-3">
+                <iframe
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(a.url)}`}
+                  title={a.nome_arquivo}
+                  className="h-96 w-full max-w-3xl rounded-lg border border-white/10"
+                />
+              </div>
             )}
           </div>
         );

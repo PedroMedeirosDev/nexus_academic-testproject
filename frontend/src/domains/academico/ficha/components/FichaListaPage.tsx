@@ -155,7 +155,11 @@ export function FichaListaPage() {
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-sm font-bold text-zinc-300 select-none">
                   {aluno.fotoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={aluno.fotoUrl} alt={aluno.nome} className="h-full w-full object-cover" />
+                    <img
+                      src={aluno.fotoUrl}
+                      alt={aluno.nome}
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     aluno.nome.charAt(0).toUpperCase()
                   )}
