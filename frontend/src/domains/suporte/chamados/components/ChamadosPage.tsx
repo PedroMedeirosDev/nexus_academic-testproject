@@ -291,7 +291,8 @@ export function ChamadosPage() {
               {items.map((c: Chamado) => (
                 <tr
                   key={c.id}
-                  className="border-t border-white/5 hover:bg-white/5"
+                  onDoubleClick={() => router.push(`/suporte/chamados/${c.id}`)}
+                  className="cursor-pointer border-t border-white/5 hover:bg-white/5"
                 >
                   <td className="px-4 py-3 font-semibold text-zinc-200">
                     {c.id}
