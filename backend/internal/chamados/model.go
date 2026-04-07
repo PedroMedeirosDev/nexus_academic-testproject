@@ -8,6 +8,16 @@ import (
 	"time"
 )
 
+var fusoHorario *time.Location
+
+func init() {
+	var err error
+	fusoHorario, err = time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		fusoHorario = time.FixedZone("BRT", -3*60*60)
+	}
+}
+
 // Listar retorna chamados com filtragem dinâmica e paginação.
 func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int, error) {
 	args := []any{}
@@ -98,7 +108,7 @@ func Listar(ctx context.Context, db *sql.DB, f Filtros) ([]ChamadoResponse, int,
 		); err != nil {
 			return nil, 0, err
 		}
-		c.DataHora = criadoEm.Format("02/01/2006 15:04")
+		c.DataHora = criadoEm.In(fusoHorario).Format("02/01/2006 15:04")
 		lista = append(lista, c)
 	}
 	return lista, total, rows.Err()
@@ -127,7 +137,7 @@ func Criar(ctx context.Context, db *sql.DB, req ChamadoRequest) (*ChamadoRespons
 	if err != nil {
 		return nil, err
 	}
-	c.DataHora = criadoEm.Format("02/01/2006 15:04")
+	c.DataHora = criadoEm.In(fusoHorario).Format("02/01/2006 15:04")
 	return &c, nil
 }
 
@@ -195,7 +205,7 @@ func ListarHistorico(ctx context.Context, db *sql.DB, idChamado int) ([]Historic
 		if err := rows.Scan(&h.ID, &h.Autor, &h.Mensagem, &criadoEm); err != nil {
 			return nil, err
 		}
-		h.Data = criadoEm.Format("02/01/2006 15:04")
+		h.Data = criadoEm.In(fusoHorario).Format("02/01/2006 15:04")
 		lista = append(lista, h)
 	}
 	return lista, rows.Err()
@@ -215,6 +225,6 @@ func AdicionarHistorico(ctx context.Context, db *sql.DB, idChamado int, req Hist
 	if err != nil {
 		return nil, err
 	}
-	h.Data = criadoEm.Format("02/01/2006 15:04")
+	h.Data = criadoEm.In(fusoHorario).Format("02/01/2006 15:04")
 	return &h, nil
 }
