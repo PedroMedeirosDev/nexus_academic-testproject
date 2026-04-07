@@ -116,7 +116,7 @@ export function AnexoViewer({ anexos, onExcluir, podeExcluir }: Props) {
         return (
           <div
             key={a.id}
-            className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden"
+            className="w-fit max-w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
           >
             <div className="flex items-center justify-between px-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -159,10 +159,10 @@ export function AnexoViewer({ anexos, onExcluir, podeExcluir }: Props) {
 
             {/* Vídeo inline */}
             {tipo === "video" && (
-              <div className="flex justify-start border-t border-white/10 p-3">
+              <div className="border-t border-white/10 p-3">
                 <video
                   controls
-                  className="w-full max-w-2xl rounded-lg bg-black"
+                  className="block w-full max-w-2xl rounded-lg bg-black"
                   style={{ maxHeight: "360px" }}
                 >
                   <source src={a.url} type={a.mime_type} />
