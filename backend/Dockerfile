@@ -4,11 +4,11 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Copia o módulo e baixa dependências (cache de layer)
-COPY go.mod go.sum ./
+COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
 # Copia o restante do código e compila
-COPY . .
+COPY backend/ .
 RUN go build -o nexus-api ./cmd/api
 
 # ── Imagem final (mínima) ─────────────────────────────────────────────────────
