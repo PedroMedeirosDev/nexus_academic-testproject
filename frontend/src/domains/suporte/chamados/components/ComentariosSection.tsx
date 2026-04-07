@@ -249,30 +249,34 @@ export function ComentariosSection({ chamadoId }: Props) {
           return (
             <li
               key={c.id}
-              className="rounded-xl border border-white/5 bg-white/[0.02] p-4"
+              className="group relative rounded-xl border border-white/5 bg-white/[0.02] p-4"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-zinc-200">
-                    {c.autor_nome}
+              {/* Botão de edição estilo Discord — aparece no hover */}
+              {ehAutor && !isEditando && (
+                <button
+                  type="button"
+                  title="Editar comentário"
+                  onClick={() => iniciarEdicao(c)}
+                  className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-[#151b2d] text-zinc-400 opacity-0 transition-all hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-400 group-hover:opacity-100"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+              )}
+
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-semibold text-zinc-200">
+                  {c.autor_nome}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  {formatarData(c.criado_em)}
+                </span>
+                {c.editado && c.editado_em && (
+                  <span className="text-xs italic text-zinc-600">
+                    editado em {formatarData(c.editado_em)}
                   </span>
-                  <span className="text-xs text-zinc-500">
-                    {formatarData(c.criado_em)}
-                  </span>
-                  {c.editado && c.editado_em && (
-                    <span className="text-xs italic text-zinc-600">
-                      editado em {formatarData(c.editado_em)}
-                    </span>
-                  )}
-                </div>
-                {ehAutor && !isEditando && (
-                  <button
-                    type="button"
-                    onClick={() => iniciarEdicao(c)}
-                    className="text-xs text-zinc-500 hover:text-zinc-300"
-                  >
-                    Editar
-                  </button>
                 )}
               </div>
 
@@ -288,9 +292,7 @@ export function ComentariosSection({ chamadoId }: Props) {
                     <button
                       type="button"
                       onClick={() => salvarEdicao(c)}
-                      disabled={
-                        !textoEdit.trim() || textoEdit === textoEditOriginal
-                      }
+                      disabled={!textoEdit.trim()}
                       className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-40"
                     >
                       Salvar
@@ -298,7 +300,7 @@ export function ComentariosSection({ chamadoId }: Props) {
                     <button
                       type="button"
                       onClick={() => setEditandoId(null)}
-                      className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-400 hover:bg-white/5"
+                      className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-white/5"
                     >
                       Cancelar
                     </button>
