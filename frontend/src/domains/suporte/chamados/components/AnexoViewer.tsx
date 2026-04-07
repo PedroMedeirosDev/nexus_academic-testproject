@@ -116,7 +116,7 @@ export function AnexoViewer({ anexos, onExcluir, podeExcluir }: Props) {
         return (
           <div
             key={a.id}
-            className="w-fit max-w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
+            className="w-fit max-w-full overflow-hidden rounded-xl border border-white/10 bg-white/3"
           >
             <div className="flex items-center justify-between px-3 py-2">
               <div className="flex items-center gap-2 min-w-0">

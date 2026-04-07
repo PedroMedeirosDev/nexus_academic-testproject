@@ -249,7 +249,7 @@ export function ComentariosSection({ chamadoId }: Props) {
           return (
             <li
               key={c.id}
-              className="group relative rounded-xl border border-white/5 bg-white/[0.02] p-4"
+              className="group relative rounded-xl border border-white/5 bg-white/2 p-4"
             >
               {/* Botão de edição estilo Discord — aparece no hover */}
               {ehAutor && !isEditando && (

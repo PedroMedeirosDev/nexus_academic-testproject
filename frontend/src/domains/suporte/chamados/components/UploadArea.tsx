@@ -60,7 +60,7 @@ export function UploadArea({ onArquivos, carregando, aceitar }: Props) {
         processar(e.dataTransfer.files);
       }}
       className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 text-sm transition-colors
-        ${arrastando ? "border-blue-500 bg-blue-500/10 text-blue-300" : "border-white/20 bg-white/[0.03] text-zinc-400"}
+        ${arrastando ? "border-blue-500 bg-blue-500/10 text-blue-300" : "border-white/20 bg-white/3 text-zinc-400"}
         ${carregando ? "pointer-events-none opacity-50" : "hover:border-blue-500/60 hover:bg-blue-500/5 hover:text-blue-300"}`}
     >
       <svg

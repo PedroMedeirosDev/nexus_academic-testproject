@@ -15,10 +15,10 @@ export function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-[120px]" />
+        <div className="absolute left-1/2 top-1/3 h-125 w-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-[120px]" />
       </div>
 
-      <div className="relative w-full max-w-md rounded-2xl border border-white/[0.07] bg-white/[0.04] p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
+      <div className="relative w-full max-w-md rounded-2xl border border-white/7 bg-white/4 p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
             <Image
@@ -27,7 +27,7 @@ export function LoginPage() {
               width={72}
               height={72}
               priority
-              className="h-auto w-[72px]"
+              className="h-auto w-18"
             />
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-violet-400">
@@ -58,7 +58,7 @@ export function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="voce@instituicao.edu.br"
-              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.05] px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200 focus:border-violet-500/70 focus:bg-white/[0.07] focus:ring-2 focus:ring-violet-500/20 hover:border-white/[0.14]"
+              className="w-full rounded-lg border border-white/8 bg-white/5 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200 focus:border-violet-500/70 focus:bg-white/[0.07] focus:ring-2 focus:ring-violet-500/20 hover:border-white/[0.14]"
             />
           </div>
 
@@ -79,7 +79,7 @@ export function LoginPage() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.05] px-4 py-3 pr-11 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200 focus:border-violet-500/70 focus:bg-white/[0.07] focus:ring-2 focus:ring-violet-500/20 hover:border-white/[0.14]"
+                className="w-full rounded-lg border border-white/8 bg-white/5 px-4 py-3 pr-11 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200 focus:border-violet-500/70 focus:bg-white/[0.07] focus:ring-2 focus:ring-violet-500/20 hover:border-white/[0.14]"
               />
               <button
                 type="button"

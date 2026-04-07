@@ -202,7 +202,7 @@ export function ChamadosPage() {
 
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#151b2d]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[950px] text-left text-sm">
+          <table className="w-full min-w-237.5 text-left text-sm">
             <thead className="border-b border-white/10 text-xs font-semibold text-zinc-400">
               <tr>
                 {(
