@@ -23,7 +23,6 @@ const MENU_COMPLETO: MenuItem[] = [
     label: "Financeiro",
     subitems: [{ label: "Ficha Financeira", href: "/financeiro/ficha" }],
   },
-  { label: "Biblioteca", href: "/biblioteca" },
   {
     label: "Suporte",
     subitems: [{ label: "Gestão de Chamados", href: "/suporte/chamados" }],
@@ -49,7 +48,6 @@ const TITULOS: Record<string, string> = {
   "/academico/ficha": "Ficha Acadêmica",
   "/academico/ficha/novo": "Novo Aluno",
   "/financeiro/ficha": "Ficha Financeira",
-  "/biblioteca": "Biblioteca",
   "/suporte/chamados": "Gestão de Chamados",
   "/suporte/chamados/novo": "Novo Chamado",
   "/perfil": "Meu Perfil",
